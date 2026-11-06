@@ -1,0 +1,1516 @@
+---
+/**
+ * index.astro — Home page: all 14 sections.
+ * Copy comes from content/home.ts, never hard-coded.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionDivider from '@/components/SectionDivider.astro';
+import PlaceholderImage from '@/components/PlaceholderImage.astro';
+import ScribbleUnderline from '@/components/ScribbleUnderline.astro';
+import StampMark from '@/components/StampMark.astro';
+import TicketCard from '@/components/TicketCard.astro';
+import { site } from '@/config/site';
+import {
+  hero, problem, howItWorks, benefits, scratchDemo,
+  customerBenefits, security, dashboard, audience,
+  pilot, onTheWay, faq, finalCta,
+} from '@/content/home';
+
+const waLink = `https://wa.me/${site.whatsapp.replace('+', '')}?text=${encodeURIComponent(site.whatsappMessage)}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: site.name,
+      url: `https://${site.domain}`,
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: site.phone,
+        contactType: 'customer service',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      name: site.name,
+      url: `https://${site.domain}`,
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.items.map(item => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.a,
+        },
+      })),
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={site.name}
+  description={hero.sub}
+  jsonLd={jsonLd}
+  pageClass="page-home"
+>
+
+  <!-- §1 HERO ──────────────────────────────────────────────── -->
+  <section class="hero section" aria-labelledby="hero-heading">
+    <div class="hero__inner container">
+      <div class="hero__text">
+        <h1 id="hero-heading" class="hero__headline t-display">
+          Paper stamp cards,<br/>without the <ScribbleUnderline>paper</ScribbleUnderline>.
+        </h1>
+        <p class="hero__sub">{hero.sub}</p>
+        <div class="hero__actions">
+          <a href={hero.primaryCta.href} class="btn btn--primary">{hero.primaryCta.label}</a>
+          <a href={hero.secondaryCta.href} class="btn btn--secondary">{hero.secondaryCta.label}</a>
+        </div>
+        <ul class="hero__facts" role="list">
+          {hero.facts.map(fact => (
+            <li class="hero__fact">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8.5l3.5 3L13 5" stroke="var(--c-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>{fact}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="hero__visual">
+        <TicketCard tilt={1.2} class="hero__ticket">
+          <div class="hero__card-mockup">
+            <div class="hero__card-header">
+              <span class="t-mono">Stamp Card</span>
+              <span class="t-mono hero__card-shop">Ravi's Chai</span>
+            </div>
+            <div class="hero__stamps-grid">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div class:list={['hero__stamp-slot', i < 4 && 'hero__stamp-slot--filled']}>
+                  {i < 4 ? (
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                      <circle cx="14" cy="14" r="11" fill="var(--c-violet)" opacity="0.15"/>
+                      <circle cx="14" cy="14" r="11" stroke="var(--c-violet)" stroke-width="1.5" fill="none" opacity="0.7"/>
+                      <path d="M9 14.5l3 3 7-7" stroke="var(--c-violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  ) : (
+                    <span class="hero__stamp-empty">{i + 1}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div class="hero__card-reward t-mono">
+              Reward: Free chai ☕
+            </div>
+          </div>
+        </TicketCard>
+        <div class="hero__stamp-landing" id="hero-stamp" aria-hidden="true">
+          <StampMark size={64} text="✓" rotation={-5} animate={true} id="hero" />
+        </div>
+        <PlaceholderImage id="hero-counter" class="hero__photo" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  <!-- §2 PROBLEM STATEMENT ─────────────────────────────────── -->
+  <section class="problem section" aria-label="The problem with paper cards">
+    <div class="problem__inner container container--narrow">
+      <p class="problem__sentence" id="problem-text">
+        {problem.sentence}
+      </p>
+    </div>
+  </section>
+
+  <!-- §3 HOW IT WORKS ──────────────────────────────────────── -->
+  <SectionDivider label={howItWorks.label} id="how-it-works" />
+  <section class="steps section" aria-labelledby="steps-heading">
+    <div class="steps__inner container">
+      <h2 id="steps-heading" class="sr-only">How it works</h2>
+      <div class="steps__layout">
+        <div class="steps__phone-col">
+          <div class="steps__phone-frame" id="steps-phone">
+            <div class="steps__phone-screen">
+              {howItWorks.steps.map((step, i) => (
+                <div class:list={['steps__screen-img', i === 0 && 'steps__screen-img--active']} data-step-screen={i}>
+                  <PlaceholderImage id={step.screen} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div class="steps__text-col">
+          {howItWorks.steps.map((step, i) => (
+            <div class:list={['steps__step', i === 0 && 'steps__step--active']} data-step-index={i}>
+              <div class="steps__step-marker">
+                <span class="steps__step-number t-mono">{step.number}</span>
+                <div class="steps__step-rail">
+                  <div class="steps__step-progress"></div>
+                </div>
+              </div>
+              <div class="steps__step-content">
+                <h3 class="steps__step-title">{step.title}</h3>
+                <p class="steps__step-desc">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §4 BENEFITS ──────────────────────────────────────────── -->
+  <SectionDivider label={benefits.label} />
+  <section class="benefits section" aria-labelledby="benefits-heading">
+    <div class="benefits__inner container">
+      <h2 id="benefits-heading" class="sr-only">Benefits for shopkeepers</h2>
+      <div class="benefits__grid">
+        {benefits.items.map((item, i) => (
+          <div
+            class:list={['benefits__item', item.isLead && 'benefits__item--lead']}
+            data-animate-in
+            style={`--stagger: ${i * 60}ms`}
+          >
+            {item.isLead && item.image && (
+              <PlaceholderImage id={item.image} class="benefits__lead-img" />
+            )}
+            <h3 class="benefits__title">{item.title}</h3>
+            <p class="benefits__desc">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- §5 SCRATCH DEMO ──────────────────────────────────────── -->
+  <SectionDivider label={scratchDemo.label} />
+  <section class="scratch section" aria-labelledby="scratch-heading">
+    <div class="scratch__inner container">
+      <h2 id="scratch-heading" class="scratch__headline">{scratchDemo.headline}</h2>
+      <TicketCard tilt={-0.8} class="scratch__card">
+        <div class="scratch__demo-area">
+          <canvas
+            class="scratch__canvas"
+            id="scratch-canvas"
+            width="320"
+            height="200"
+            role="img"
+            aria-label="Scratch card demo — scratch to reveal a surprise reward"
+          ></canvas>
+          <div class="scratch__prize" id="scratch-prize" aria-live="polite">
+            🎉 Free chai on your next visit!
+          </div>
+          <button class="btn btn--ghost scratch__reveal-btn" id="scratch-reveal" type="button">
+            Reveal
+          </button>
+          <p class="scratch__caption t-mono">{scratchDemo.caption}</p>
+        </div>
+      </TicketCard>
+    </div>
+  </section>
+
+  <!-- §6 FOR YOUR CUSTOMERS ────────────────────────────────── -->
+  <SectionDivider label={customerBenefits.label} />
+  <section class="customers section" aria-labelledby="customers-heading">
+    <div class="customers__inner container">
+      <h2 id="customers-heading" class="customers__heading">What your customers get</h2>
+      <div class="customers__layout">
+        <PlaceholderImage id={customerBenefits.image} class="customers__img" />
+        <ul class="customers__list" role="list">
+          {customerBenefits.items.map(item => (
+            <li class="customers__item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="7" stroke="var(--c-violet)" stroke-width="1.5" fill="var(--c-violet-tint)"/>
+                <path d="M6 9.5l2 2 4-4" stroke="var(--c-violet)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- §7 FAIR AND SECURE ───────────────────────────────────── -->
+  <SectionDivider label={security.label} />
+  <section class="secure section" aria-labelledby="secure-heading">
+    <div class="secure__inner container">
+      <h2 id="secure-heading" class="secure__heading">Fair and secure</h2>
+      <div class="secure__layout">
+        <ul class="secure__list" role="list">
+          {security.features.map(feat => (
+            <li class="secure__item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M9 2L3 5v4c0 4 2.5 7 6 8 3.5-1 6-4 6-8V5l-6-3z" stroke="var(--c-violet)" stroke-width="1.5" fill="var(--c-violet-tint)"/>
+              </svg>
+              <span>{feat}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="secure__qr-demo">
+          <div class="secure__qr-frame" id="qr-demo-container">
+            <canvas id="qr-canvas" width="200" height="200"></canvas>
+            <div class="secure__qr-countdown" id="qr-countdown"></div>
+          </div>
+          <p class="secure__qr-caption t-mono">{security.qrCaption}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §8 DASHBOARD PREVIEW ─────────────────────────────────── -->
+  <SectionDivider label={dashboard.label} />
+  <section class="ledger section" aria-labelledby="ledger-heading">
+    <div class="ledger__inner container">
+      <h2 id="ledger-heading" class="ledger__heading">{dashboard.headline}</h2>
+      <div class="ledger__table-wrap">
+        <table class="ledger__table" aria-label="Sample shop dashboard">
+          <thead>
+            <tr>
+              <th class="t-mono">Time</th>
+              <th class="t-mono">Event</th>
+              <th class="t-mono">Customer</th>
+              <th class="t-mono">Status</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-body">
+            {dashboard.sampleRows.map((row, i) => (
+              <tr class="ledger__row" data-ledger-row={i} style={`--row-delay: ${i * 150}ms`}>
+                <td class="t-mono">{row.time}</td>
+                <td>{row.event}</td>
+                <td>{row.customer}</td>
+                <td class="ledger__status">{row.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="ledger__disclaimer t-mono">{dashboard.disclaimer}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- §9 WHO IT IS FOR ─────────────────────────────────────── -->
+  <SectionDivider label={audience.label} />
+  <section class="audience section" aria-labelledby="audience-heading">
+    <div class="audience__inner container">
+      <h2 id="audience-heading" class="audience__heading">Who it is for</h2>
+      <p class="audience__types">
+        {audience.shopTypes.join(' · ')}
+      </p>
+      <div class="audience__images">
+        {audience.images.map((id, i) => (
+          <PlaceholderImage id={id} class:list={['audience__img', i === 1 && 'audience__img--offset']} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- §10 START WITH A FREE PILOT ──────────────────────────── -->
+  <section class="pilot section" aria-labelledby="pilot-heading">
+    <div class="pilot__inner container">
+      <h2 id="pilot-heading" class="pilot__heading">{pilot.headline}</h2>
+      <ol class="pilot__steps" role="list">
+        {pilot.steps.map((step, i) => (
+          <li class="pilot__step" data-animate-in style={`--stagger: ${i * 100}ms`}>
+            <span class="pilot__step-num t-mono">{i + 1}</span>
+            <span class="pilot__step-text">{step}</span>
+          </li>
+        ))}
+      </ol>
+      {site.pricing.visible ? (
+        <div class="pilot__pricing">
+          {/* Pricing cards would render here */}
+        </div>
+      ) : (
+        <p class="pilot__fallback">{pilot.fallbackText}</p>
+      )}
+      <div class="pilot__actions">
+        <a href="/contact" class="btn btn--primary">Start a free pilot</a>
+        <a href={waLink} class="btn btn--whatsapp" target="_blank" rel="noopener noreferrer">
+          WhatsApp us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- §11 ON THE WAY ───────────────────────────────────────── -->
+  <section class="roadmap section" aria-labelledby="roadmap-heading">
+    <div class="roadmap__inner container container--narrow">
+      <h2 id="roadmap-heading" class="roadmap__heading t-mono">{onTheWay.label}</h2>
+      <ul class="roadmap__list" role="list">
+        {onTheWay.items.map(item => (
+          <li class="roadmap__item t-small">{item}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- §12 FAQ ──────────────────────────────────────────────── -->
+  <SectionDivider label={faq.label} />
+  <section class="faq section" aria-labelledby="faq-heading">
+    <div class="faq__inner container container--narrow">
+      <h2 id="faq-heading" class="faq__heading">Common questions</h2>
+      {faq.items.map(item => (
+        <details class="faq__item">
+          <summary class="faq__question">{item.q}</summary>
+          <p class="faq__answer">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- §13 FINAL CTA ────────────────────────────────────────── -->
+  <section class="final-cta" aria-labelledby="final-cta-heading">
+    <div class="final-cta__inner container">
+      <h2 id="final-cta-heading" class="final-cta__headline">{finalCta.headline}</h2>
+      <div class="final-cta__actions">
+        <a href={waLink} class="btn btn--whatsapp btn--final" target="_blank" rel="noopener noreferrer">
+          {finalCta.whatsappLabel}
+        </a>
+        <a href="/contact" class="btn btn--secondary btn--final-secondary">{finalCta.pilotLabel}</a>
+      </div>
+      <div class="final-cta__stamp" id="final-stamp">
+        <StampMark size={96} text="✓" rotation={-4} animate={true} id="final" />
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ================================================================
+     HOME PAGE STYLES
+     ================================================================ */
+
+  /* --- §1 HERO ----------------------------------------------- */
+  .hero {
+    padding-top: calc(var(--header-height) + var(--s-8));
+    padding-bottom: var(--s-7);
+    overflow: visible;
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    .hero__inner {
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: var(--s-8);
+    }
+  }
+
+  .hero__headline {
+    margin-bottom: var(--s-5);
+    max-width: 14ch;
+  }
+
+  .hero__sub {
+    font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem);
+    color: var(--c-ink-muted);
+    max-width: 48ch;
+    margin-bottom: var(--s-6);
+    line-height: 1.6;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-bottom: var(--s-6);
+  }
+
+  .hero__facts {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3) var(--s-5);
+  }
+
+  .hero__fact {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-size: var(--f-small);
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+
+  /* Hero visual */
+  .hero__visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero__ticket {
+    position: relative;
+    z-index: 2;
+    max-width: 320px;
+    width: 100%;
+  }
+
+  .hero__photo {
+    margin-top: calc(var(--s-6) * -1);
+    position: relative;
+    z-index: 1;
+    max-width: 360px;
+    width: 100%;
+  }
+
+  @media (min-width: 64rem) {
+    .hero__photo {
+      margin-top: calc(var(--s-8) * -1);
+      max-width: 420px;
+    }
+  }
+
+  .hero__stamp-landing {
+    position: absolute;
+    top: 0;
+    right: 10%;
+    z-index: 3;
+  }
+
+  /* Card mockup */
+  .hero__card-mockup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .hero__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hero__card-shop {
+    color: var(--c-violet);
+    font-weight: 600;
+  }
+
+  .hero__stamps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-2);
+  }
+
+  .hero__stamp-slot {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed var(--c-hairline);
+    border-radius: var(--r-sm);
+    background: var(--c-page);
+  }
+
+  .hero__stamp-slot--filled {
+    border-style: solid;
+    border-color: var(--c-violet-tint);
+    background: var(--c-violet-tint);
+  }
+
+  .hero__stamp-empty {
+    font-family: var(--ff-mono);
+    font-size: 0.6875rem;
+    color: var(--c-hairline);
+  }
+
+  .hero__card-reward {
+    color: var(--c-ink-muted);
+    font-size: 0.75rem;
+    text-align: center;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--c-hairline);
+  }
+
+  /* --- §2 PROBLEM -------------------------------------------- */
+  .problem {
+    padding-block: var(--s-10);
+  }
+
+  .problem__sentence {
+    font-family: var(--ff-display);
+    font-size: var(--f-h2);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    max-width: 24ch;
+    color: var(--c-ink);
+  }
+
+  /* Word-level scroll opacity — each word wrapped by script */
+  .problem__sentence :global(.word) {
+    opacity: 0.2;
+    transition: opacity 0.15s var(--ease-out);
+  }
+
+  .problem__sentence :global(.word.visible) {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .problem__sentence :global(.word) {
+      opacity: 1;
+    }
+  }
+
+  /* --- §3 HOW IT WORKS --------------------------------------- */
+  .steps__inner {
+    /* nothing special at mobile */
+  }
+
+  .steps__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 64rem) {
+    .steps__layout {
+      grid-template-columns: 0.4fr 0.6fr;
+      gap: var(--s-8);
+    }
+  }
+
+  /* Phone frame */
+  .steps__phone-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 64rem) {
+    .steps__phone-col {
+      position: sticky;
+      top: calc(var(--header-height) + var(--s-6));
+      align-self: start;
+    }
+  }
+
+  .steps__phone-frame {
+    width: 220px;
+    border: 2px solid var(--c-ink);
+    border-radius: 24px;
+    padding: 8px;
+    background: var(--c-surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .steps__phone-screen {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 9 / 19.5;
+    background: var(--c-page);
+  }
+
+  .steps__screen-img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out);
+  }
+
+  .steps__screen-img--active {
+    opacity: 1;
+  }
+
+  /* Step items */
+  .steps__step {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: var(--s-3);
+    padding: var(--s-5) 0;
+    border-bottom: 1px solid var(--c-hairline);
+    opacity: 0.4;
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .steps__step--active {
+    opacity: 1;
+  }
+
+  .steps__step-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .steps__step-number {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--c-hairline);
+    border-radius: 50%;
+    font-size: 0.75rem;
+    color: var(--c-ink-muted);
+    flex-shrink: 0;
+  }
+
+  .steps__step--active .steps__step-number {
+    border-color: var(--c-violet);
+    color: var(--c-violet);
+    background: var(--c-violet-tint);
+  }
+
+  .steps__step-rail {
+    width: 2px;
+    flex: 1;
+    background: var(--c-hairline);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .steps__step-progress {
+    width: 100%;
+    height: 0%;
+    background: var(--c-violet);
+    transition: height 0.4s var(--ease-out);
+  }
+
+  .steps__step--active .steps__step-progress {
+    height: 100%;
+  }
+
+  .steps__step-title {
+    font-size: var(--f-h3);
+    margin-bottom: var(--s-2);
+  }
+
+  .steps__step-desc {
+    color: var(--c-ink-muted);
+    font-size: var(--f-small);
+    max-width: 48ch;
+  }
+
+  @media (min-width: 64rem) {
+    .steps__step {
+      min-height: 70vh;
+      padding: var(--s-7) 0;
+    }
+  }
+
+  /* --- §4 BENEFITS ------------------------------------------- */
+  .benefits__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  @media (min-width: 40rem) {
+    .benefits__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--s-5);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .benefits__grid {
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: var(--s-5);
+    }
+
+    /* Lead item spans full left */
+    .benefits__item--lead {
+      grid-row: 1 / 3;
+    }
+
+    /* After lead + 2 small items, switch to 3 columns */
+    .benefits__item:nth-child(n+4) {
+      grid-column: auto;
+    }
+
+    .benefits__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .benefits__item--lead {
+      grid-column: 1 / 3;
+      grid-row: auto;
+    }
+  }
+
+  .benefits__item {
+    padding: var(--s-5);
+    background: var(--c-surface);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-sm);
+  }
+
+  /* Animate in */
+  [data-animate-in] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
+    transition-delay: var(--stagger, 0ms);
+  }
+
+  [data-animate-in][data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate-in] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .benefits__lead-img {
+    margin-bottom: var(--s-4);
+  }
+
+  .benefits__title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-bottom: var(--s-2);
+  }
+
+  .benefits__desc {
+    font-size: var(--f-small);
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+
+  /* --- §5 SCRATCH DEMO --------------------------------------- */
+  .scratch__headline {
+    font-size: var(--f-h2);
+    max-width: 20ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .scratch__inner {
+    max-width: 48rem;
+  }
+
+  .scratch__card {
+    max-width: 360px;
+  }
+
+  .scratch__demo-area {
+    position: relative;
+    text-align: center;
+  }
+
+  .scratch__canvas {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    border-radius: var(--r-sm);
+    cursor: crosshair;
+    touch-action: none;
+    display: block;
+    margin-inline: auto;
+  }
+
+  .scratch__prize {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--ff-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--c-violet);
+    z-index: -1;
+    text-align: center;
+    width: 80%;
+    pointer-events: none;
+  }
+
+  .scratch__reveal-btn {
+    margin-top: var(--s-3);
+  }
+
+  .scratch__caption {
+    margin-top: var(--s-3);
+    font-size: 0.6875rem;
+    text-align: center;
+  }
+
+  /* --- §6 FOR YOUR CUSTOMERS --------------------------------- */
+  .customers__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .customers__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  @media (min-width: 48rem) {
+    .customers__layout {
+      grid-template-columns: 0.45fr 0.55fr;
+      gap: var(--s-7);
+    }
+  }
+
+  .customers__img {
+    max-width: 320px;
+  }
+
+  .customers__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .customers__item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: 1.0625rem;
+    margin: 0;
+  }
+
+  .customers__item svg {
+    flex-shrink: 0;
+  }
+
+  /* --- §7 FAIR AND SECURE ------------------------------------ */
+  .secure__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .secure__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+    align-items: start;
+  }
+
+  @media (min-width: 48rem) {
+    .secure__layout {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .secure__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .secure__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    margin: 0;
+  }
+
+  .secure__item svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .secure__qr-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .secure__qr-frame {
+    border: 2px solid var(--c-ink);
+    border-radius: var(--r-md);
+    padding: var(--s-4);
+    background: var(--c-surface);
+    position: relative;
+  }
+
+  .secure__qr-frame canvas {
+    display: block;
+  }
+
+  .secure__qr-countdown {
+    height: 3px;
+    background: var(--c-hairline);
+    border-radius: 2px;
+    margin-top: var(--s-3);
+    overflow: hidden;
+  }
+
+  .secure__qr-countdown::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--c-violet);
+    transform-origin: left;
+    animation: countdown-shrink 5s linear infinite;
+  }
+
+  @keyframes countdown-shrink {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+  }
+
+  .secure__qr-caption {
+    font-size: 0.6875rem;
+    text-align: center;
+    max-width: 24ch;
+  }
+
+  /* --- §8 DASHBOARD ------------------------------------------ */
+  .ledger__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .ledger__table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ledger__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--f-small);
+  }
+
+  .ledger__table th {
+    text-align: left;
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 2px solid var(--c-ink);
+    font-size: 0.6875rem;
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: var(--c-ink-muted);
+  }
+
+  .ledger__table td {
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--c-hairline);
+    white-space: nowrap;
+  }
+
+  .ledger__row {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.35s var(--ease-out),
+      transform 0.35s var(--ease-out);
+    transition-delay: var(--row-delay, 0ms);
+  }
+
+  .ledger__row[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ledger__row {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .ledger__status {
+    color: var(--c-success);
+    font-weight: 500;
+  }
+
+  .ledger__disclaimer {
+    margin-top: var(--s-3);
+    font-size: 0.6875rem;
+    text-align: right;
+    color: var(--c-ink-muted);
+  }
+
+  /* --- §9 WHO IT IS FOR -------------------------------------- */
+  .audience__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-4);
+  }
+
+  .audience__types {
+    font-size: 1.0625rem;
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-6);
+  }
+
+  .audience__images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--s-4);
+  }
+
+  .audience__img--offset {
+    margin-top: var(--s-5);
+  }
+
+  @media (max-width: 39.9375rem) {
+    .audience__img--offset {
+      margin-top: 0;
+    }
+  }
+
+  /* --- §10 PILOT --------------------------------------------- */
+  .pilot__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .pilot__steps {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+    margin-bottom: var(--s-6);
+    max-width: 32rem;
+  }
+
+  .pilot__step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-4);
+  }
+
+  .pilot__step-num {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--c-violet);
+    border-radius: 50%;
+    color: var(--c-violet);
+    font-size: 0.875rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .pilot__step-text {
+    padding-top: var(--s-2);
+    line-height: 1.5;
+  }
+
+  .pilot__fallback {
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-6);
+  }
+
+  .pilot__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  /* --- §11 ON THE WAY ---------------------------------------- */
+  .roadmap {
+    padding-block: var(--s-6);
+  }
+
+  .roadmap__heading {
+    font-size: 0.75rem;
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .roadmap__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+  }
+
+  .roadmap__item {
+    color: var(--c-ink-muted);
+    margin: 0;
+    position: relative;
+    padding-left: var(--s-4);
+  }
+
+  .roadmap__item::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: var(--c-hairline);
+  }
+
+  /* --- §12 FAQ ----------------------------------------------- */
+  .faq__heading {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--c-hairline);
+  }
+
+  .faq__question {
+    font-family: var(--ff-body);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    padding: var(--s-4) 0;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    padding-right: var(--s-6);
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__question::after {
+    content: '+';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--ff-mono);
+    font-size: 1.25rem;
+    color: var(--c-ink-muted);
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .faq__item[open] .faq__question::after {
+    content: '−';
+  }
+
+  .faq__answer {
+    padding-bottom: var(--s-5);
+    color: var(--c-ink-muted);
+    max-width: 60ch;
+    line-height: 1.65;
+  }
+
+  /* Height transition for details */
+  .faq__item {
+    overflow: hidden;
+  }
+
+  /* --- §13 FINAL CTA ----------------------------------------- */
+  .final-cta {
+    background: var(--c-violet);
+    color: #fff;
+    padding: var(--s-10) 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .final-cta__inner {
+    position: relative;
+    z-index: 1;
+    text-align: left;
+  }
+
+  .final-cta__headline {
+    font-family: var(--ff-display);
+    font-size: var(--f-h1);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: var(--s-6);
+    max-width: 18ch;
+  }
+
+  .final-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  .btn--final-secondary {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .btn--final-secondary:hover {
+    border-color: #fff;
+    color: #fff;
+  }
+
+  .final-cta__stamp {
+    position: absolute;
+    bottom: var(--s-6);
+    right: var(--s-6);
+    opacity: 0.15;
+  }
+
+  @media (min-width: 64rem) {
+    .final-cta__stamp {
+      right: 10%;
+      bottom: 15%;
+      opacity: 0.2;
+    }
+  }
+</style>
+
+<!-- Inline scripts for scroll interactions -->
+<script is:inline>
+(function () {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- IntersectionObserver helper ---
+  function onInView(selector, callback, options) {
+    const els = document.querySelectorAll(selector);
+    if (!els.length) return;
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          callback(entry.target);
+          if (options && options.once) obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: options && options.threshold || 0.15 });
+    els.forEach(function (el) { obs.observe(el); });
+  }
+
+  // --- 1. Hero stamp animation (700ms after load) ---
+  setTimeout(function () {
+    var heroStamp = document.querySelector('#hero-stamp .stamp-mark--animate');
+    if (heroStamp) heroStamp.setAttribute('data-visible', 'true');
+    // Also animate the scribble underline
+    var scribble = document.querySelector('.scribble');
+    if (scribble) scribble.setAttribute('data-visible', 'true');
+  }, 700);
+
+  // --- 2. Problem sentence word reveal ---
+  if (!reducedMotion) {
+    var problemEl = document.getElementById('problem-text');
+    if (problemEl) {
+      var text = problemEl.textContent || '';
+      var words = text.trim().split(/\s+/);
+      problemEl.innerHTML = words.map(function (w) {
+        return '<span class="word">' + w + '</span>';
+      }).join(' ');
+
+      var wordEls = problemEl.querySelectorAll('.word');
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.5, rootMargin: '-10% 0px -10% 0px' });
+      wordEls.forEach(function (w) { obs.observe(w); });
+    }
+  }
+
+  // --- 3. How it works — step pinning ---
+  var stepEls = document.querySelectorAll('[data-step-index]');
+  var screenEls = document.querySelectorAll('[data-step-screen]');
+  if (stepEls.length && screenEls.length) {
+    var stepObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var idx = parseInt(entry.target.getAttribute('data-step-index'), 10);
+          stepEls.forEach(function (s) { s.classList.remove('steps__step--active'); });
+          screenEls.forEach(function (s) { s.classList.remove('steps__screen-img--active'); });
+          entry.target.classList.add('steps__step--active');
+          var screen = document.querySelector('[data-step-screen="' + idx + '"]');
+          if (screen) screen.classList.add('steps__screen-img--active');
+        }
+      });
+    }, { threshold: 0.4, rootMargin: '-30% 0px -30% 0px' });
+    stepEls.forEach(function (s) { stepObs.observe(s); });
+  }
+
+  // --- 4. Generic animate-in (benefits, pilot steps) ---
+  onInView('[data-animate-in]', function (el) {
+    el.setAttribute('data-visible', 'true');
+  }, { once: true, threshold: 0.1 });
+
+  // --- 5. Ledger rows ---
+  onInView('.ledger__row', function (el) {
+    el.setAttribute('data-visible', 'true');
+  }, { once: true, threshold: 0.1 });
+
+  // --- 6. Stamp marks ---
+  onInView('.stamp-mark--animate', function (el) {
+    el.setAttribute('data-visible', 'true');
+  }, { once: true, threshold: 0.4 });
+
+})();
+</script>
+
+<!-- Scratch card demo -->
+<script is:inline>
+(function () {
+  var canvas = document.getElementById('scratch-canvas');
+  var revealBtn = document.getElementById('scratch-reveal');
+  if (!canvas) return;
+
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  var w = canvas.width;
+  var h = canvas.height;
+  var isDrawing = false;
+
+  // Draw the foil
+  function drawFoil() {
+    // Gold gradient
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#C9A94E');
+    grad.addColorStop(0.3, '#B8962E');
+    grad.addColorStop(0.5, '#D4AD50');
+    grad.addColorStop(0.7, '#B8962E');
+    grad.addColorStop(1, '#A68526');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle noise
+    for (var i = 0; i < 3000; i++) {
+      ctx.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.08) + ')';
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+    }
+
+    // Text
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '600 18px ' + getComputedStyle(document.documentElement).getPropertyValue('--ff-display');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Scratch here ✨', w / 2, h / 2);
+  }
+
+  drawFoil();
+
+  // Scratch
+  function scratch(x, y) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = w / rect.width;
+    var scaleY = h / rect.height;
+    if (e.touches && e.touches[0]) {
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY,
+      };
+    }
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  }
+
+  canvas.addEventListener('mousedown', function (e) { isDrawing = true; scratch(getPos(e).x, getPos(e).y); });
+  canvas.addEventListener('mousemove', function (e) { if (isDrawing) scratch(getPos(e).x, getPos(e).y); });
+  canvas.addEventListener('mouseup', function () { isDrawing = false; });
+  canvas.addEventListener('mouseleave', function () { isDrawing = false; });
+  canvas.addEventListener('touchstart', function (e) { e.preventDefault(); isDrawing = true; var p = getPos(e); scratch(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove', function (e) { e.preventDefault(); if (isDrawing) { var p = getPos(e); scratch(p.x, p.y); } }, { passive: false });
+  canvas.addEventListener('touchend', function () { isDrawing = false; });
+
+  // Reveal button for keyboard / reduced motion
+  if (revealBtn) {
+    revealBtn.addEventListener('click', function () {
+      ctx.clearRect(0, 0, w, h);
+    });
+  }
+})();
+</script>
+
+<!-- QR demo -->
+<script is:inline>
+(function () {
+  var container = document.getElementById('qr-demo-container');
+  var canvas = document.getElementById('qr-canvas');
+  if (!canvas || !container) return;
+
+  // Simple QR-like pattern (we can't import the npm package in inline script)
+  // Draw a fake QR pattern that changes
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  var size = 200;
+  var cellSize = 10;
+  var seed = 0;
+
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function drawQR() {
+    var rand = mulberry32(seed++);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, size, size);
+
+    ctx.fillStyle = 'var(--c-ink, #101820)';
+    // Fixed position finders (corners)
+    drawFinder(0, 0);
+    drawFinder(size - 70, 0);
+    drawFinder(0, size - 70);
+
+    // Random data area
+    for (var x = 80; x < size - 10; x += cellSize) {
+      for (var y = 80; y < size - 10; y += cellSize) {
+        if (rand() > 0.5) {
+          ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
+        }
+      }
+    }
+    // Fill remaining areas
+    for (var x2 = 80; x2 < size - 10; x2 += cellSize) {
+      for (var y2 = 10; y2 < 70; y2 += cellSize) {
+        if (rand() > 0.5) {
+          ctx.fillRect(x2, y2, cellSize - 1, cellSize - 1);
+        }
+      }
+    }
+    for (var x3 = 10; x3 < 70; x3 += cellSize) {
+      for (var y3 = 80; y3 < size - 10; y3 += cellSize) {
+        if (rand() > 0.5) {
+          ctx.fillRect(x3, y3, cellSize - 1, cellSize - 1);
+        }
+      }
+    }
+  }
+
+  function drawFinder(x, y) {
+    ctx.fillStyle = '#101820';
+    ctx.fillRect(x + 10, y + 10, 50, 50);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x + 17, y + 17, 36, 36);
+    ctx.fillStyle = '#101820';
+    ctx.fillRect(x + 23, y + 23, 24, 24);
+  }
+
+  drawQR();
+  setInterval(drawQR, 5000);
+})();
+</script>
+

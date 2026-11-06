@@ -1,0 +1,344 @@
+---
+/**
+ * privacy-policy.astro
+ * Draft. Have a lawyer review before launch.
+ * DPDP-style notice, plain language. All unknowns marked [[FILL]].
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/config/site';
+
+const sections = [
+  { id: 'who-we-are', label: 'Who we are' },
+  { id: 'data-we-collect', label: 'Data we collect' },
+  { id: 'why-we-use-it', label: 'Why we use it' },
+  { id: 'who-sees-it', label: 'Who sees it' },
+  { id: 'how-long', label: 'How long we keep it' },
+  { id: 'your-rights', label: 'Your rights' },
+  { id: 'security', label: 'Security' },
+  { id: 'children', label: 'Children' },
+  { id: 'cookies', label: 'Cookies' },
+  { id: 'changes', label: 'Changes to this policy' },
+  { id: 'contact', label: 'Contact' },
+];
+---
+
+<BaseLayout
+  title="Privacy policy"
+  description="How Stamp collects, uses and protects your data."
+  pageClass="page-policy"
+>
+
+  <article class="policy section" aria-labelledby="policy-heading">
+    <div class="policy__inner container">
+
+      <!-- Summary box -->
+      <header class="policy__header">
+        <h1 id="policy-heading" class="policy__title">Privacy policy</h1>
+        <p class="policy__updated t-mono">Last updated: {site.policyLastUpdated}</p>
+        <div class="policy__summary">
+          <p><strong>In plain words:</strong> We collect your name and mobile number so you can use the stamp card. Your shop owner sees your visits. We do not sell your data and we do not use advertising cookies. You can ask us to delete your data at any time.</p>
+        </div>
+      </header>
+
+      <div class="policy__body-layout">
+        <!-- TOC (sticky on large screens) -->
+        <nav class="policy__toc" aria-label="Table of contents">
+          <span class="policy__toc-label t-mono">Contents</span>
+          <ol class="policy__toc-list">
+            {sections.map(s => (
+              <li><a href={`#${s.id}`} class="policy__toc-link">{s.label}</a></li>
+            ))}
+          </ol>
+        </nav>
+
+        <!-- Content -->
+        <div class="policy__content">
+
+          <section id="who-we-are">
+            <h2>Who we are</h2>
+            <p>{site.name} is operated by <strong>{site.legalEntity}</strong>, registered at {site.registeredAddress}.</p>
+            <p>Grievance officer: <strong>{site.grievanceOfficer.name}</strong>, <a href={`mailto:${site.grievanceOfficer.email}`}>{site.grievanceOfficer.email}</a>.</p>
+          </section>
+
+          <section id="data-we-collect">
+            <h2>Data we collect</h2>
+            <h3>Customers</h3>
+            <ul>
+              <li>Name and mobile number (to sign in and identify you at the shop).</li>
+              <li>Stamp, scratch card and reward activity with timestamps.</li>
+              <li>Browser notification subscription, if you allow it.</li>
+              <li>One-time code records, stored as a one-way hash.</li>
+              <li>IP address, used only for security and rate-limiting.</li>
+            </ul>
+            <h3>Location</h3>
+            <p>If you allow it, your position is compared with the shop's location to flag stamps that look far away. We do not store your coordinates.</p>
+            <h3>Shop owners</h3>
+            <ul>
+              <li>Owner mobile number, shop name, shop location, program settings and activity.</li>
+            </ul>
+            <h3>Website visitors</h3>
+            <ul>
+              <li>Contact form details (name, phone, email, message).</li>
+              <li>Standard server logs (IP address, browser type, pages visited, timestamps).</li>
+            </ul>
+            <p>We do not use advertising cookies. Analytics is {site.analyticsEnabled ? 'enabled' : 'off'}.</p>
+          </section>
+
+          <section id="why-we-use-it">
+            <h2>Why we use each item</h2>
+            <ul>
+              <li><strong>Sign in:</strong> your mobile number confirms your identity via a one-time code.</li>
+              <li><strong>Stamps and rewards:</strong> we record visits so you and the shop can track progress.</li>
+              <li><strong>Reminders:</strong> browser notifications tell you when a reward is ready or when you have not visited in a while.</li>
+              <li><strong>Fraud prevention:</strong> IP address, location comparison, and one-time codes stop misuse.</li>
+              <li><strong>Support:</strong> contact form details let us reply to you.</li>
+            </ul>
+          </section>
+
+          <section id="who-sees-it">
+            <h2>Who sees it</h2>
+            <ul>
+              <li>The <strong>shop owner</strong> sees their own customers' activity (name, phone, stamps, rewards). They do not see other shops' customers.</li>
+              <li><strong>Service providers</strong> we use: [[FILL: names of SMS provider, hosting provider, browser push service]].</li>
+              <li>We do not sell your data. [[FILL: owner to confirm "we do not sell data"]]</li>
+            </ul>
+          </section>
+
+          <section id="how-long">
+            <h2>How long we keep it</h2>
+            <ul>
+              <li>Customer account data: [[FILL: retention period, e.g. "as long as your account is active, plus 12 months after you delete it"]].</li>
+              <li>Stamp and reward records: [[FILL: retention period]].</li>
+              <li>Contact form submissions: 12 months, then automatically deleted.</li>
+              <li>Server logs: [[FILL: retention period, e.g. "90 days"]].</li>
+            </ul>
+          </section>
+
+          <section id="your-rights">
+            <h2>Your rights</h2>
+            <p>Under India's Digital Personal Data Protection Act, you have the right to:</p>
+            <ul>
+              <li><strong>Access</strong> your data — see what we hold about you.</li>
+              <li><strong>Correct</strong> inaccurate information.</li>
+              <li><strong>Erase</strong> your data — ask us to delete it.</li>
+              <li><strong>Withdraw consent</strong> — stopping is as easy as giving consent was.</li>
+              <li><strong>Nominate</strong> someone to act on your behalf.</li>
+              <li><strong>Complain</strong> if you are not satisfied with how we handle your data.</li>
+            </ul>
+            <p>To use any of these rights, <a href="/contact?topic=data_request">submit a data request</a> or contact our grievance officer at <a href={`mailto:${site.grievanceOfficer.email}`}>{site.grievanceOfficer.email}</a>.</p>
+            <p>We will respond within [[FILL: response time, e.g. "30 days". The law allows up to 90 days.]].</p>
+            <p>If you are not satisfied, you may complain to the <strong>Data Protection Board of India</strong>.</p>
+          </section>
+
+          <section id="security">
+            <h2>Security</h2>
+            <p>We use HTTPS for all traffic, hash sensitive tokens, restrict database access, and keep software up to date. No system is perfectly secure, but we take reasonable steps to protect your data.</p>
+            <p>If we discover a data breach that affects you, we will notify you and the Data Protection Board of India as required by law.</p>
+          </section>
+
+          <section id="children">
+            <h2>Children</h2>
+            <p>This service is for people aged 18 and over. [[FILL: owner to confirm the age rule. Under-18 users need verifiable parental consent under the DPDP Act.]]</p>
+          </section>
+
+          <section id="cookies">
+            <h2>Cookies</h2>
+            <p>The product app uses a session cookie to keep you signed in. It is essential for the service to work and is not used for tracking.</p>
+            <p>This marketing website does not set any cookies{site.analyticsEnabled ? ' except a minimal analytics cookie' : ''}.</p>
+          </section>
+
+          <section id="changes">
+            <h2>Changes to this policy</h2>
+            <p>We may update this policy from time to time. When we do, we will update the date at the top and, if the change is significant, notify you through the app or by email.</p>
+          </section>
+
+          <section id="contact">
+            <h2>Contact</h2>
+            <p>Questions about this policy? <a href="/contact?topic=data_request">Contact us</a> or reach our grievance officer:</p>
+            <ul>
+              <li>Name: {site.grievanceOfficer.name}</li>
+              <li>Email: <a href={`mailto:${site.grievanceOfficer.email}`}>{site.grievanceOfficer.email}</a></li>
+              <li>Address: {site.registeredAddress}</li>
+            </ul>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+</BaseLayout>
+
+<style>
+  .policy {
+    padding-top: calc(var(--header-height) + var(--s-8));
+  }
+
+  .policy__title {
+    font-size: var(--f-h1);
+    margin-bottom: var(--s-2);
+  }
+
+  .policy__updated {
+    color: var(--c-ink-muted);
+    font-size: 0.75rem;
+    margin-bottom: var(--s-5);
+  }
+
+  .policy__summary {
+    background: var(--c-violet-tint);
+    border-left: 3px solid var(--c-violet);
+    padding: var(--s-4) var(--s-5);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    margin-bottom: var(--s-7);
+  }
+
+  .policy__summary p {
+    margin: 0;
+    font-size: var(--f-small);
+    line-height: 1.6;
+  }
+
+  /* TOC + Content layout */
+  .policy__body-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+  }
+
+  @media (min-width: 64rem) {
+    .policy__body-layout {
+      grid-template-columns: 12rem 1fr;
+      gap: var(--s-8);
+    }
+  }
+
+  /* TOC */
+  .policy__toc {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .policy__toc {
+      display: block;
+      position: sticky;
+      top: calc(var(--header-height) + var(--s-5));
+      align-self: start;
+      max-height: calc(100dvh - var(--header-height) - var(--s-8));
+      overflow-y: auto;
+    }
+  }
+
+  .policy__toc-label {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--c-ink-muted);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--s-3);
+  }
+
+  .policy__toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .policy__toc-list li {
+    margin-bottom: var(--s-1);
+  }
+
+  .policy__toc-link {
+    font-size: 0.8125rem;
+    color: var(--c-ink-muted);
+    text-decoration: none;
+    padding: var(--s-1) 0;
+    display: block;
+    border-left: 2px solid transparent;
+    padding-left: var(--s-3);
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .policy__toc-link:hover {
+    color: var(--c-violet);
+  }
+
+  .policy__toc-link.active {
+    color: var(--c-violet);
+    border-left-color: var(--c-violet);
+    font-weight: 500;
+  }
+
+  /* Content */
+  .policy__content {
+    max-width: var(--content-narrow);
+  }
+
+  .policy__content section {
+    margin-bottom: var(--s-7);
+    scroll-margin-top: calc(var(--header-height) + var(--s-5));
+  }
+
+  .policy__content h2 {
+    font-size: var(--f-h3);
+    margin-bottom: var(--s-4);
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+
+  .policy__content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: var(--s-4);
+    margin-bottom: var(--s-2);
+  }
+
+  .policy__content p {
+    color: var(--c-ink-muted);
+    line-height: 1.7;
+  }
+
+  .policy__content ul {
+    padding-left: var(--s-5);
+    color: var(--c-ink-muted);
+  }
+
+  .policy__content li {
+    line-height: 1.65;
+    margin-bottom: var(--s-2);
+  }
+
+  .policy__content a {
+    color: var(--c-violet);
+  }
+
+  /* Print */
+  @media print {
+    .policy__toc { display: none; }
+    .policy__body-layout { grid-template-columns: 1fr; }
+    .policy__content { max-width: 100%; }
+  }
+</style>
+
+<!-- Scroll spy for TOC -->
+<script is:inline>
+(function () {
+  var tocLinks = document.querySelectorAll('.policy__toc-link');
+  var sections = document.querySelectorAll('.policy__content section[id]');
+  if (!tocLinks.length || !sections.length) return;
+
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function (l) { l.classList.remove('active'); });
+        var link = document.querySelector('.policy__toc-link[href="#' + entry.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(function (s) { obs.observe(s); });
+})();
+</script>
+

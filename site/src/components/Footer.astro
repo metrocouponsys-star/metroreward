@@ -1,0 +1,184 @@
+---
+/**
+ * Footer.astro — Simple, grounded footer with links and legal info.
+ */
+import { site } from '@/config/site';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__rule" aria-hidden="true"></div>
+  <div class="footer__inner container">
+    <div class="footer__top">
+      <div class="footer__brand-col">
+        <a href="/" class="footer__logo" aria-label={`${site.name} — home`}>
+          <svg class="footer__mark" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="24" height="24" rx="5" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <circle cx="10" cy="10" r="2.5" fill="currentColor"/>
+            <circle cx="18" cy="10" r="2.5" fill="currentColor"/>
+            <circle cx="10" cy="18" r="2.5" fill="currentColor"/>
+            <circle cx="18" cy="18" r="2.5" fill="var(--c-violet)" opacity="0.5"/>
+          </svg>
+          <span class="footer__brand-name">{site.name}</span>
+        </a>
+        <p class="footer__tagline t-small">{site.tagline}</p>
+      </div>
+
+      <nav class="footer__nav" aria-label="Footer navigation">
+        <div class="footer__nav-group">
+          <span class="footer__nav-label t-mono">Pages</span>
+          <ul class="footer__nav-list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer__nav-group">
+          <span class="footer__nav-label t-mono">Legal</span>
+          <ul class="footer__nav-list">
+            <li><a href="/privacy-policy">Privacy policy</a></li>
+            <li><a href="/terms-and-conditions">Terms and conditions</a></li>
+            <li><a href="/refund-policy">Refund policy</a></li>
+          </ul>
+        </div>
+        <div class="footer__nav-group">
+          <span class="footer__nav-label t-mono">Reach us</span>
+          <ul class="footer__nav-list">
+            <li>
+              <a
+                href={`https://wa.me/${site.whatsapp.replace('+', '')}?text=${encodeURIComponent(site.whatsappMessage)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                WhatsApp
+              </a>
+            </li>
+            <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+            <li><a href={`tel:${site.phone}`}>{site.phone}</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__legal t-small">
+        © {currentYear} {site.legalEntity}. {site.city}.
+      </p>
+      <p class="footer__address t-small">
+        {site.registeredAddress}
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: auto;
+    padding-block: var(--s-8) var(--s-6);
+  }
+
+  .footer__rule {
+    height: 1px;
+    background: var(--c-hairline);
+    max-width: var(--content-width);
+    margin-inline: auto;
+    margin-bottom: var(--s-8);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-7);
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+  }
+
+  @media (min-width: 48rem) {
+    .footer__top {
+      grid-template-columns: 1.2fr 2fr;
+      gap: var(--s-8);
+    }
+  }
+
+  /* Brand column */
+  .footer__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    text-decoration: none;
+    color: var(--c-ink);
+    margin-bottom: var(--s-2);
+  }
+
+  .footer__logo:hover {
+    color: var(--c-violet);
+  }
+
+  .footer__brand-name {
+    font-family: var(--ff-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .footer__tagline {
+    max-width: 28ch;
+    line-height: 1.5;
+  }
+
+  /* Nav groups */
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--s-6);
+  }
+
+  .footer__nav-label {
+    display: block;
+    margin-bottom: var(--s-3);
+    font-size: 0.6875rem;
+    text-transform: lowercase;
+    letter-spacing: 0.08em;
+  }
+
+  .footer__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer__nav-list li {
+    margin-bottom: var(--s-2);
+  }
+
+  .footer__nav-list a {
+    font-size: var(--f-small);
+    color: var(--c-ink-muted);
+    text-decoration: none;
+  }
+
+  .footer__nav-list a:hover {
+    color: var(--c-violet);
+  }
+
+  /* Bottom */
+  .footer__bottom {
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--c-hairline);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+  }
+
+  .footer__legal,
+  .footer__address {
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+</style>
+

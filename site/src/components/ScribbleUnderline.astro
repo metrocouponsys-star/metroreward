@@ -1,0 +1,66 @@
+---
+/**
+ * ScribbleUnderline.astro — Hand-drawn SVG underline that draws on viewport entry.
+ * Used under one word in the hero.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<span class:list={['scribble', className]}>
+  <slot />
+  <svg
+    class="scribble__line"
+    viewBox="0 0 200 12"
+    preserveAspectRatio="none"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M3 8c30-5 60 2 90-1s50-4 80 0c8 1 18 2 24 1"
+      stroke="var(--c-violet)"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-dasharray="200"
+      stroke-dashoffset="200"
+      class="scribble__path"
+    />
+  </svg>
+</span>
+
+<style>
+  .scribble {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .scribble__line {
+    position: absolute;
+    left: -4%;
+    right: -4%;
+    bottom: -0.15em;
+    width: 108%;
+    height: 0.35em;
+    pointer-events: none;
+  }
+
+  .scribble__path {
+    transition: stroke-dashoffset 0.6s var(--ease-out) 0.7s;
+  }
+
+  .scribble[data-visible="true"] .scribble__path {
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scribble__path {
+      stroke-dashoffset: 0 !important;
+      transition: none;
+    }
+  }
+</style>
+

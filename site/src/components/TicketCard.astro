@@ -1,0 +1,72 @@
+---
+/**
+ * TicketCard.astro — Card with perforated edge and slight tilt.
+ */
+interface Props {
+  tilt?: number; // degrees, between -1.5 and 1.5
+  class?: string;
+  perforatedSide?: 'left' | 'top';
+}
+
+const { tilt = 0, class: className = '', perforatedSide = 'left' } = Astro.props;
+---
+
+<div
+  class:list={['ticket', `ticket--perf-${perforatedSide}`, className]}
+  style={tilt !== 0 ? `transform: rotate(${tilt}deg)` : undefined}
+>
+  <div class="ticket__inner">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .ticket {
+    position: relative;
+    background: var(--c-surface);
+    border-radius: var(--r-sm);
+    box-shadow: var(--shadow-sm);
+    overflow: visible;
+  }
+
+  .ticket--perf-left {
+    border-left: none;
+    padding-left: var(--s-1);
+  }
+
+  .ticket--perf-left::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 0;
+    border-left: 2px dashed var(--c-hairline);
+  }
+
+  .ticket--perf-top {
+    border-top: none;
+    padding-top: var(--s-1);
+  }
+
+  .ticket--perf-top::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 0;
+    height: 0;
+    border-top: 2px dashed var(--c-hairline);
+  }
+
+  .ticket__inner {
+    padding: var(--s-5) var(--s-6);
+  }
+
+  @media (max-width: 39.9375rem) {
+    .ticket__inner {
+      padding: var(--s-4) var(--s-5);
+    }
+  }
+</style>
+

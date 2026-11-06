@@ -1,0 +1,503 @@
+---
+/**
+ * contact.astro — Contact page with form + info.
+ * Form is a client-side island for validation.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PlaceholderImage from '@/components/PlaceholderImage.astro';
+import { site } from '@/config/site';
+import { intro, details, formConfig } from '@/content/contact';
+
+const waLink = `https://wa.me/${site.whatsapp.replace('+', '')}?text=${encodeURIComponent(site.whatsappMessage)}`;
+
+// Read topic from URL for preselection
+const topicParam = Astro.url.searchParams.get('topic') || '';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch about running a pilot, ask a question, or make a data request."
+  pageClass="page-contact"
+>
+
+  <section class="contact section" aria-labelledby="contact-heading">
+    <div class="contact__inner container">
+      <div class="contact__layout">
+
+        <!-- Left: info -->
+        <div class="contact__info">
+          <h1 id="contact-heading" class="contact__headline">{intro.headline}</h1>
+          <p class="contact__sub">{intro.sub}</p>
+
+          <div class="contact__channels">
+            <a href={waLink} class="btn btn--whatsapp" target="_blank" rel="noopener noreferrer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              WhatsApp us
+            </a>
+
+            <div class="contact__detail">
+              <span class="contact__detail-label t-mono">phone</span>
+              <a href={`tel:${site.phone}`}>{site.phone}</a>
+            </div>
+
+            <div class="contact__detail">
+              <span class="contact__detail-label t-mono">email</span>
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+            </div>
+
+            <div class="contact__detail">
+              <span class="contact__detail-label t-mono">address</span>
+              <span>{site.registeredAddress}</span>
+            </div>
+
+            <div class="contact__detail">
+              <span class="contact__detail-label t-mono">hours</span>
+              <span>{details.hours}</span>
+            </div>
+          </div>
+
+          <PlaceholderImage id="contact-front" class="contact__storefront" />
+        </div>
+
+        <!-- Right: form -->
+        <div class="contact__form-wrap">
+          <form
+            class="contact-form"
+            id="contact-form"
+            method="POST"
+            action="/api/public/contact"
+            novalidate
+          >
+            <!-- Honeypot -->
+            <div class="contact-form__honey" aria-hidden="true" tabindex="-1">
+              <label for="website">Website</label>
+              <input type="text" id="website" name="website" autocomplete="off" tabindex="-1" />
+            </div>
+            <input type="hidden" name="startedAt" id="form-started-at" />
+
+            <div class="contact-form__field">
+              <label for="name" class="contact-form__label">Name <span class="contact-form__req" aria-label="required">*</span></label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                minlength="2"
+                maxlength="80"
+                class="contact-form__input"
+                autocomplete="name"
+              />
+              <span class="contact-form__error" id="name-error"></span>
+            </div>
+
+            <div class="contact-form__field">
+              <label for="phone" class="contact-form__label">Mobile number <span class="contact-form__req" aria-label="required">*</span></label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                required
+                pattern="[0-9+\- ]{10,15}"
+                class="contact-form__input"
+                autocomplete="tel"
+                placeholder="e.g. 9876543210"
+              />
+              <span class="contact-form__error" id="phone-error"></span>
+            </div>
+
+            <div class="contact-form__row">
+              <div class="contact-form__field">
+                <label for="shopName" class="contact-form__label">Shop name</label>
+                <input
+                  type="text"
+                  id="shopName"
+                  name="shopName"
+                  maxlength="100"
+                  class="contact-form__input"
+                />
+              </div>
+              <div class="contact-form__field">
+                <label for="city" class="contact-form__label">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  maxlength="80"
+                  class="contact-form__input"
+                />
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label for="email" class="contact-form__label">Email <span class="t-small" style="color: var(--c-ink-muted)">(optional)</span></label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="contact-form__input"
+                autocomplete="email"
+              />
+            </div>
+
+            <div class="contact-form__row">
+              <div class="contact-form__field">
+                <label for="topic" class="contact-form__label">Topic</label>
+                <select id="topic" name="topic" class="contact-form__select">
+                  {formConfig.topics.map(t => (
+                    <option value={t.value} selected={topicParam === t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div class="contact-form__field">
+                <label for="preferredChannel" class="contact-form__label">Preferred channel</label>
+                <select id="preferredChannel" name="preferredChannel" class="contact-form__select">
+                  {formConfig.channels.map(c => (
+                    <option value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label for="message" class="contact-form__label">Message</label>
+              <textarea
+                id="message"
+                name="message"
+                maxlength="1000"
+                rows="4"
+                class="contact-form__textarea"
+              ></textarea>
+              <span class="contact-form__hint t-small" id="message-count">0 / 1000</span>
+            </div>
+
+            <div class="contact-form__field contact-form__consent">
+              <label class="contact-form__checkbox-label">
+                <input type="checkbox" id="consent" name="consent" required class="contact-form__checkbox" />
+                <span>{formConfig.consentText} <a href="/privacy-policy" target="_blank">Privacy policy</a>.</span>
+              </label>
+              <span class="contact-form__error" id="consent-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn--primary contact-form__submit" id="form-submit">
+              Send message
+            </button>
+
+            <div class="contact-form__status" id="form-status" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .contact {
+    padding-top: calc(var(--header-height) + var(--s-8));
+  }
+
+  .contact__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-8);
+  }
+
+  @media (min-width: 48rem) {
+    .contact__layout {
+      grid-template-columns: 0.45fr 0.55fr;
+      gap: var(--s-9);
+    }
+  }
+
+  /* Info side */
+  .contact__headline {
+    font-size: var(--f-h1);
+    margin-bottom: var(--s-3);
+  }
+
+  .contact__sub {
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-6);
+    max-width: 40ch;
+  }
+
+  .contact__channels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    margin-bottom: var(--s-6);
+  }
+
+  .contact__detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .contact__detail-label {
+    font-size: 0.6875rem;
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    color: var(--c-ink-muted);
+  }
+
+  .contact__detail a,
+  .contact__detail span {
+    font-size: var(--f-small);
+  }
+
+  .contact__storefront {
+    margin-top: var(--s-5);
+  }
+
+  /* Form */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .contact-form__honey {
+    position: absolute;
+    left: -9999px;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .contact-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-4);
+  }
+
+  @media (max-width: 31.25rem) {
+    .contact-form__row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact-form__label {
+    font-size: var(--f-small);
+    font-weight: 500;
+  }
+
+  .contact-form__req {
+    color: var(--c-alert);
+  }
+
+  .contact-form__input,
+  .contact-form__select,
+  .contact-form__textarea {
+    font-family: var(--ff-body);
+    font-size: var(--f-small);
+    padding: var(--s-3);
+    border: 1.5px solid var(--c-hairline);
+    border-radius: var(--r-sm);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    transition: border-color var(--dur-fast) var(--ease-out);
+    outline: none;
+  }
+
+  .contact-form__input:focus,
+  .contact-form__select:focus,
+  .contact-form__textarea:focus {
+    border-color: var(--c-violet);
+    box-shadow: 0 0 0 3px var(--c-violet-tint);
+  }
+
+  .contact-form__input[aria-invalid="true"],
+  .contact-form__select[aria-invalid="true"],
+  .contact-form__textarea[aria-invalid="true"] {
+    border-color: var(--c-alert);
+  }
+
+  .contact-form__textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .contact-form__error {
+    font-size: 0.75rem;
+    color: var(--c-alert);
+    min-height: 1em;
+  }
+
+  .contact-form__hint {
+    color: var(--c-ink-muted);
+    text-align: right;
+  }
+
+  /* Consent */
+  .contact-form__consent {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .contact-form__checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-2);
+    font-size: var(--f-small);
+    cursor: pointer;
+    line-height: 1.5;
+  }
+
+  .contact-form__checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--c-violet);
+  }
+
+  .contact-form__submit {
+    align-self: flex-start;
+    margin-top: var(--s-2);
+  }
+
+  .contact-form__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .contact-form__status {
+    font-size: var(--f-small);
+    min-height: 1.5em;
+  }
+
+  .contact-form__status--success {
+    color: var(--c-success);
+    font-weight: 500;
+  }
+
+  .contact-form__status--error {
+    color: var(--c-alert);
+  }
+</style>
+
+<script is:inline>
+(function () {
+  var form = document.getElementById('contact-form');
+  var startedAtInput = document.getElementById('form-started-at');
+  var statusEl = document.getElementById('form-status');
+  var submitBtn = document.getElementById('form-submit');
+  var messageInput = document.getElementById('message');
+  var messageCount = document.getElementById('message-count');
+
+  if (!form) return;
+
+  // Set startedAt on page load
+  startedAtInput.value = new Date().toISOString();
+
+  // Message character counter
+  if (messageInput && messageCount) {
+    messageInput.addEventListener('input', function () {
+      messageCount.textContent = messageInput.value.length + ' / 1000';
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    statusEl.textContent = '';
+    statusEl.className = 'contact-form__status';
+
+    // Basic validation
+    var name = form.elements.name.value.trim();
+    var phone = form.elements.phone.value.trim();
+    var consent = form.elements.consent.checked;
+    var honeypot = form.elements.website.value;
+
+    // Clear errors
+    document.querySelectorAll('.contact-form__error').forEach(function (el) { el.textContent = ''; });
+    document.querySelectorAll('[aria-invalid]').forEach(function (el) { el.removeAttribute('aria-invalid'); });
+
+    var valid = true;
+
+    if (name.length < 2) {
+      document.getElementById('name-error').textContent = 'Please enter your name (at least 2 characters).';
+      form.elements.name.setAttribute('aria-invalid', 'true');
+      valid = false;
+    }
+
+    // Normalise Indian phone
+    var cleanPhone = phone.replace(/[\s\-+]/g, '');
+    if (cleanPhone.startsWith('91') && cleanPhone.length === 12) cleanPhone = cleanPhone.slice(2);
+    if (!/^\d{10}$/.test(cleanPhone)) {
+      document.getElementById('phone-error').textContent = 'Please enter a valid 10-digit mobile number.';
+      form.elements.phone.setAttribute('aria-invalid', 'true');
+      valid = false;
+    }
+
+    if (!consent) {
+      document.getElementById('consent-error').textContent = 'Please agree to let us reply to you.';
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // Spam: honeypot must be empty
+    if (honeypot) return;
+
+    // Spam: minimum 3 seconds
+    var started = new Date(startedAtInput.value);
+    if (Date.now() - started.getTime() < 3000) return;
+
+    // Submit
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    var body = {
+      name: name,
+      phone: '+91' + cleanPhone,
+      shopName: form.elements.shopName.value.trim() || undefined,
+      city: form.elements.city.value.trim() || undefined,
+      email: form.elements.email.value.trim() || undefined,
+      topic: form.elements.topic.value,
+      preferredChannel: form.elements.preferredChannel.value,
+      message: form.elements.message.value.trim() || undefined,
+      consent: true,
+      website: '',
+      startedAt: startedAtInput.value,
+    };
+
+    fetch('/api/public/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+      .then(function (res) {
+        if (res.ok) {
+          statusEl.textContent = 'Thank you. We will get back to you within one working day.';
+          statusEl.className = 'contact-form__status contact-form__status--success';
+          form.reset();
+          startedAtInput.value = new Date().toISOString();
+        } else {
+          return res.json().then(function (data) {
+            throw new Error(data.error || 'Something went wrong. Please try again.');
+          });
+        }
+      })
+      .catch(function (err) {
+        statusEl.textContent = err.message || 'Something went wrong. Please try again.';
+        statusEl.className = 'contact-form__status contact-form__status--error';
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message';
+      });
+  });
+})();
+</script>
+

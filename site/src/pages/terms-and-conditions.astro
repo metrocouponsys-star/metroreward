@@ -1,0 +1,183 @@
+---
+/**
+ * terms-and-conditions.astro
+ * Draft. Have a lawyer review before launch.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/config/site';
+
+const sections = [
+  { id: 'what-this-is', label: 'What this service is' },
+  { id: 'accounts', label: 'Accounts and codes' },
+  { id: 'shop-responsibilities', label: 'Shop responsibilities' },
+  { id: 'customer-responsibilities', label: 'Customer responsibilities' },
+  { id: 'fraud', label: 'Fraud and voiding' },
+  { id: 'availability', label: 'Availability' },
+  { id: 'no-warranty', label: 'No warranty of results' },
+  { id: 'liability', label: 'Limits of liability' },
+  { id: 'termination', label: 'Termination' },
+  { id: 'governing-law', label: 'Governing law' },
+  { id: 'contact', label: 'Contact' },
+];
+---
+
+<BaseLayout
+  title="Terms and conditions"
+  description="Terms of use for the Stamp loyalty platform."
+  pageClass="page-policy"
+>
+
+  <article class="policy section" aria-labelledby="terms-heading">
+    <div class="policy__inner container">
+
+      <header class="policy__header">
+        <h1 id="terms-heading" class="policy__title">Terms and conditions</h1>
+        <p class="policy__updated t-mono">Last updated: {site.policyLastUpdated}</p>
+        <div class="policy__summary">
+          <p><strong>In plain words:</strong> {site.name} gives shopkeepers a digital stamp card for their customers. Shops must honour the rewards they set. Customers must scan honestly. We can void stamps if something looks wrong, and we log the reason.</p>
+        </div>
+      </header>
+
+      <div class="policy__body-layout">
+        <nav class="policy__toc" aria-label="Table of contents">
+          <span class="policy__toc-label t-mono">Contents</span>
+          <ol class="policy__toc-list">
+            {sections.map(s => (
+              <li><a href={`#${s.id}`} class="policy__toc-link">{s.label}</a></li>
+            ))}
+          </ol>
+        </nav>
+
+        <div class="policy__content">
+
+          <section id="what-this-is">
+            <h2>What this service is</h2>
+            <p>{site.name} is a digital stamp card and scratch card platform. Shop owners create a loyalty program. Customers scan a QR code at the shop to collect stamps, may receive scratch card prizes, and claim rewards when their card is full.</p>
+            <p>By using {site.name}, you agree to these terms. If you do not agree, please do not use the service.</p>
+          </section>
+
+          <section id="accounts">
+            <h2>Accounts and one-time codes</h2>
+            <p>Customers sign in with their mobile number and a one-time code sent by SMS. You are responsible for keeping your phone number secure. Do not share one-time codes with anyone.</p>
+            <p>Shop owners are given accounts by {site.name} administrators. Each account is tied to one shop.</p>
+          </section>
+
+          <section id="shop-responsibilities">
+            <h2>Shop responsibilities</h2>
+            <ul>
+              <li><strong>Honour rewards:</strong> you must give the reward you set in your program when a customer presents a valid claim code.</li>
+              <li><strong>Accurate program:</strong> set realistic stamps-to-reward ratios and honest scratch card prizes.</li>
+              <li><strong>Lawful prizes:</strong> all prizes and rewards must comply with local laws. Do not offer anything illegal or misleading.</li>
+              <li><strong>Data use:</strong> you may only use customer data visible in your dashboard for the purpose of running your loyalty program. Do not sell or share it.</li>
+            </ul>
+          </section>
+
+          <section id="customer-responsibilities">
+            <h2>Customer responsibilities</h2>
+            <ul>
+              <li><strong>Scan honestly:</strong> only scan the QR when you are physically at the shop.</li>
+              <li><strong>No code sharing:</strong> do not share claim codes or screenshots of them with others.</li>
+              <li><strong>One account:</strong> use one account per person. Do not create multiple accounts to collect extra stamps.</li>
+            </ul>
+          </section>
+
+          <section id="fraud">
+            <h2>Fraud and voiding</h2>
+            <p>Shop owners and {site.name} administrators may void stamps, prizes, or rewards if:</p>
+            <ul>
+              <li>A stamp was collected without a genuine visit (for example, scanning from a photo).</li>
+              <li>Multiple accounts are used by the same person.</li>
+              <li>Any other misuse is detected.</li>
+            </ul>
+            <p>Every void action is logged with a reason, visible to both the shop and the customer.</p>
+          </section>
+
+          <section id="availability">
+            <h2>Availability and maintenance</h2>
+            <p>We aim to keep {site.name} running at all times, but we do not guarantee uninterrupted service. We may take the service offline for maintenance with reasonable notice when possible.</p>
+            <p>If the internet connection at a shop drops, the QR code stops rotating and customers cannot collect stamps until the connection is restored.</p>
+          </section>
+
+          <section id="no-warranty">
+            <h2>No warranty of sales results</h2>
+            <p>{site.name} is a tool for customer loyalty. We do not guarantee that it will increase your sales, foot traffic, or customer retention. Results depend on your business, your rewards, and your customers.</p>
+          </section>
+
+          <section id="liability">
+            <h2>Limits of liability</h2>
+            <p>To the maximum extent permitted by law, {site.legalEntity} is not liable for indirect, incidental, or consequential damages arising from your use of {site.name}.</p>
+            <p>Our total liability for any claim is limited to the amount you have paid us in the 12 months before the claim, or ₹5,000, whichever is greater.</p>
+          </section>
+
+          <section id="termination">
+            <h2>Termination</h2>
+            <p>You may stop using {site.name} at any time. Shop owners can contact us to deactivate their program.</p>
+            <p>We may suspend or terminate accounts that violate these terms, with notice when possible.</p>
+            <p>On termination, customer stamps and rewards for that shop are no longer redeemable.</p>
+          </section>
+
+          <section id="governing-law">
+            <h2>Governing law and courts</h2>
+            <p>These terms are governed by the laws of India. Disputes will be subject to the exclusive jurisdiction of the courts in [[FILL: city, e.g. "Pune, Maharashtra"]].</p>
+          </section>
+
+          <section id="contact">
+            <h2>Contact</h2>
+            <p>Questions about these terms? <a href="/contact">Contact us</a> or write to:</p>
+            <p>{site.legalEntity}<br/>{site.registeredAddress}<br/><a href={`mailto:${site.email}`}>{site.email}</a></p>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+</BaseLayout>
+
+<style>
+  /* Reuses .policy styles from privacy-policy via page-policy class */
+  .policy { padding-top: calc(var(--header-height) + var(--s-8)); }
+  .policy__title { font-size: var(--f-h1); margin-bottom: var(--s-2); }
+  .policy__updated { color: var(--c-ink-muted); font-size: 0.75rem; margin-bottom: var(--s-5); }
+  .policy__summary { background: var(--c-violet-tint); border-left: 3px solid var(--c-violet); padding: var(--s-4) var(--s-5); border-radius: 0 var(--r-sm) var(--r-sm) 0; margin-bottom: var(--s-7); }
+  .policy__summary p { margin: 0; font-size: var(--f-small); line-height: 1.6; }
+  .policy__body-layout { display: grid; grid-template-columns: 1fr; gap: var(--s-7); }
+  @media (min-width: 64rem) { .policy__body-layout { grid-template-columns: 12rem 1fr; gap: var(--s-8); } }
+  .policy__toc { display: none; }
+  @media (min-width: 64rem) { .policy__toc { display: block; position: sticky; top: calc(var(--header-height) + var(--s-5)); align-self: start; } }
+  .policy__toc-label { display: block; font-size: 0.6875rem; color: var(--c-ink-muted); text-transform: lowercase; letter-spacing: 0.06em; margin-bottom: var(--s-3); }
+  .policy__toc-list { list-style: none; padding: 0; margin: 0; }
+  .policy__toc-list li { margin-bottom: var(--s-1); }
+  .policy__toc-link { font-size: 0.8125rem; color: var(--c-ink-muted); text-decoration: none; padding: var(--s-1) 0; display: block; border-left: 2px solid transparent; padding-left: var(--s-3); transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .policy__toc-link:hover { color: var(--c-violet); }
+  .policy__toc-link.active { color: var(--c-violet); border-left-color: var(--c-violet); font-weight: 500; }
+  .policy__content { max-width: var(--content-narrow); }
+  .policy__content section { margin-bottom: var(--s-7); scroll-margin-top: calc(var(--header-height) + var(--s-5)); }
+  .policy__content h2 { font-size: var(--f-h3); margin-bottom: var(--s-4); padding-bottom: var(--s-2); border-bottom: 1px solid var(--c-hairline); }
+  .policy__content h3 { font-size: 1rem; font-weight: 600; margin-top: var(--s-4); margin-bottom: var(--s-2); }
+  .policy__content p { color: var(--c-ink-muted); line-height: 1.7; }
+  .policy__content ul { padding-left: var(--s-5); color: var(--c-ink-muted); }
+  .policy__content li { line-height: 1.65; margin-bottom: var(--s-2); }
+  .policy__content a { color: var(--c-violet); }
+  @media print { .policy__toc { display: none; } .policy__body-layout { grid-template-columns: 1fr; } }
+</style>
+
+<script is:inline>
+(function () {
+  var tocLinks = document.querySelectorAll('.policy__toc-link');
+  var sections = document.querySelectorAll('.policy__content section[id]');
+  if (!tocLinks.length || !sections.length) return;
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function (l) { l.classList.remove('active'); });
+        var link = document.querySelector('.policy__toc-link[href="#' + entry.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(function (s) { obs.observe(s); });
+})();
+</script>
+

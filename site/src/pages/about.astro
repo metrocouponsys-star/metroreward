@@ -1,0 +1,333 @@
+---
+/**
+ * about.astro — About page.
+ * Copy from content/about.ts. Quieter design than Home.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionDivider from '@/components/SectionDivider.astro';
+import PlaceholderImage from '@/components/PlaceholderImage.astro';
+import StampMark from '@/components/StampMark.astro';
+import { site } from '@/config/site';
+import { opening, why, principles, pilotSteps, team, location, aboutCta } from '@/content/about';
+
+const waLink = `https://wa.me/${site.whatsapp.replace('+', '')}?text=${encodeURIComponent(site.whatsappMessage)}`;
+---
+
+<BaseLayout
+  title="About"
+  description="Why we built Stamp, what we believe, and how a pilot works."
+  pageClass="page-about"
+>
+
+  <!-- Opening -->
+  <section class="about-hero section" aria-labelledby="about-heading">
+    <div class="about-hero__inner container">
+      <h1 id="about-heading" class="about-hero__headline">{opening.headline}</h1>
+      <p class="about-hero__sub">{opening.sub}</p>
+    </div>
+  </section>
+
+  <!-- Why we built this -->
+  <SectionDivider label="our story" />
+  <section class="about-why section" aria-labelledby="why-heading">
+    <div class="about-why__inner container">
+      <div class="about-why__layout">
+        <div class="about-why__text">
+          <h2 id="why-heading">{why.headline}</h2>
+          {why.paragraphs.map(p => (
+            <p class="about-why__para">{p}</p>
+          ))}
+        </div>
+        <div class="about-why__images">
+          <PlaceholderImage id="about-founder" class="about-why__founder" />
+          <PlaceholderImage id="about-workshop" class="about-why__workshop" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What we believe -->
+  <SectionDivider label="principles" />
+  <section class="about-principles section" aria-labelledby="principles-heading">
+    <div class="about-principles__inner container">
+      <h2 id="principles-heading">{principles.headline}</h2>
+      <div class="about-principles__grid">
+        {principles.items.map((item, i) => (
+          <div class="about-principles__item" data-animate-in style={`--stagger: ${i * 80}ms`}>
+            <StampMark size={32} text="·" rotation={-3 + i * 2} animate={false} id={`principle-${i}`} />
+            <h3 class="about-principles__title">{item.title}</h3>
+            <p class="about-principles__desc">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- How a pilot works -->
+  <SectionDivider label="pilot" />
+  <section class="about-pilot section" aria-labelledby="pilot-heading">
+    <div class="about-pilot__inner container">
+      <h2 id="pilot-heading">{pilotSteps.headline}</h2>
+      <ol class="about-pilot__steps" role="list">
+        {pilotSteps.steps.map((step, i) => (
+          <li class="about-pilot__step" data-animate-in style={`--stagger: ${i * 100}ms`}>
+            <span class="about-pilot__num t-mono">{i + 1}</span>
+            <div>
+              <h3 class="about-pilot__step-title">{step.title}</h3>
+              <p class="about-pilot__step-desc">{step.description}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <PlaceholderImage id="about-visit" class="about-pilot__visit-img" />
+    </div>
+  </section>
+
+  <!-- The people -->
+  <SectionDivider label="team" />
+  <section class="about-team section" aria-labelledby="team-heading">
+    <div class="about-team__inner container container--narrow">
+      <h2 id="team-heading">{team.headline}</h2>
+      <p>{team.description}</p>
+    </div>
+  </section>
+
+  <!-- Where we are -->
+  <section class="about-location section" aria-labelledby="location-heading">
+    <div class="about-location__inner container container--narrow">
+      <h2 id="location-heading">{location.headline}</h2>
+      <p>{location.text}</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="about-cta" aria-labelledby="about-cta-heading">
+    <div class="about-cta__inner container">
+      <h2 id="about-cta-heading" class="about-cta__headline">{aboutCta.headline}</h2>
+      <p class="about-cta__text">{aboutCta.text}</p>
+      <div class="about-cta__actions">
+        <a href={aboutCta.primaryCta.href} class="btn btn--primary">{aboutCta.primaryCta.label}</a>
+        <a href={waLink} class="btn btn--whatsapp" target="_blank" rel="noopener noreferrer">
+          {aboutCta.secondaryCta.label}
+        </a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* --- About Hero --- */
+  .about-hero {
+    padding-top: calc(var(--header-height) + var(--s-9));
+  }
+
+  .about-hero__headline {
+    font-size: var(--f-h1);
+    max-width: 20ch;
+    margin-bottom: var(--s-4);
+  }
+
+  .about-hero__sub {
+    font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem);
+    color: var(--c-ink-muted);
+    max-width: 52ch;
+  }
+
+  /* --- Why --- */
+  .about-why__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+  }
+
+  @media (min-width: 48rem) {
+    .about-why__layout {
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: var(--s-8);
+    }
+  }
+
+  .about-why__text h2 {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-5);
+  }
+
+  .about-why__para {
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-4);
+  }
+
+  .about-why__images {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .about-why__founder {
+    max-width: 280px;
+  }
+
+  /* --- Principles --- */
+  .about-principles__inner h2 {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .about-principles__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  @media (min-width: 40rem) {
+    .about-principles__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-5) var(--s-6);
+    }
+  }
+
+  .about-principles__item {
+    padding: var(--s-5);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-sm);
+    background: var(--c-surface);
+  }
+
+  .about-principles__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: var(--s-3) 0 var(--s-2);
+  }
+
+  .about-principles__desc {
+    font-size: var(--f-small);
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+
+  /* --- Pilot --- */
+  .about-pilot__inner h2 {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-6);
+  }
+
+  .about-pilot__steps {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+
+  .about-pilot__step {
+    display: flex;
+    gap: var(--s-4);
+    align-items: flex-start;
+  }
+
+  .about-pilot__num {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--c-violet);
+    border-radius: 50%;
+    color: var(--c-violet);
+    font-size: 0.875rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .about-pilot__step-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-bottom: var(--s-1);
+  }
+
+  .about-pilot__step-desc {
+    font-size: var(--f-small);
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+
+  .about-pilot__visit-img {
+    max-width: 560px;
+  }
+
+  /* --- Team, Location --- */
+  .about-team__inner h2,
+  .about-location__inner h2 {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-4);
+  }
+
+  .about-team__inner p,
+  .about-location__inner p {
+    color: var(--c-ink-muted);
+  }
+
+  /* --- CTA --- */
+  .about-cta {
+    background: var(--c-violet-tint);
+    padding: var(--s-9) 0;
+  }
+
+  .about-cta__headline {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-3);
+  }
+
+  .about-cta__text {
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-6);
+    max-width: 48ch;
+  }
+
+  .about-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  /* Animate-in support */
+  [data-animate-in] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
+    transition-delay: var(--stagger, 0ms);
+  }
+
+  [data-animate-in][data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate-in] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script is:inline>
+(function () {
+  var items = document.querySelectorAll('[data-animate-in]');
+  if (!items.length) return;
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.setAttribute('data-visible', 'true');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  items.forEach(function (el) { obs.observe(el); });
+})();
+</script>
+

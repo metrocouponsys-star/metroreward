@@ -1,0 +1,156 @@
+.wrapper {
+  min-height: 100dvh;
+  background: var(--page);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.noPrintBar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.printSheet {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  margin: 1.5rem auto;
+  box-shadow: 0 4px 24px rgba(16, 24, 32, 0.08);
+  border-radius: 8px;
+}
+
+.borderBox {
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.badgeRow {
+  margin-bottom: 0.25rem;
+}
+
+.brandBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0.25rem 0.75rem;
+  background: var(--ink);
+  color: #ffffff;
+  border-radius: 100px;
+}
+
+.shopTitle {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.offerBox {
+  background: var(--violet-light);
+  border: 1.5px solid var(--violet);
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+  width: 100%;
+}
+
+.offerSubtitle {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.offerTitle {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--violet);
+}
+
+.qrContainer {
+  background: #ffffff;
+  padding: 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+}
+
+.qrCanvas {
+  display: block;
+  width: 240px;
+  height: 240px;
+}
+
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.callout {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.subtext {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.urlHint {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.5rem;
+  word-break: break-all;
+  font-family: monospace;
+}
+
+.footerStub {
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+  border-top: 1px dashed var(--hairline);
+  padding-top: 0.75rem;
+  width: 100%;
+}
+
+@media print {
+  .noPrintBar {
+    display: none !important;
+  }
+  body, html {
+    background: #ffffff !important;
+  }
+  .wrapper {
+    background: #ffffff !important;
+  }
+  .printSheet {
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+  }
+  .borderBox {
+    border: 2px solid #000000 !important;
+  }
+}
+

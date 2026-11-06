@@ -1,0 +1,96 @@
+/* ============================================================
+   type.css — Typography rules
+   ============================================================ */
+
+/* --- Display headings -------------------------------------- */
+.t-display {
+  font-family: var(--ff-display);
+  font-size: var(--f-display);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+}
+
+h1, .t-h1 {
+  font-family: var(--ff-display);
+  font-size: var(--f-h1);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--c-ink);
+}
+
+h2, .t-h2 {
+  font-family: var(--ff-display);
+  font-size: var(--f-h2);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
+}
+
+h3, .t-h3 {
+  font-family: var(--ff-display);
+  font-size: var(--f-h3);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--c-ink);
+}
+
+/* --- Body text --------------------------------------------- */
+p {
+  max-width: 68ch;
+  margin-bottom: var(--s-4);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Mono caption ------------------------------------------ */
+.t-mono {
+  font-family: var(--ff-mono);
+  font-size: var(--f-mono);
+  color: var(--c-ink-muted);
+  letter-spacing: 0.02em;
+}
+
+/* --- Handwriting ------------------------------------------- */
+.t-hand {
+  font-family: var(--ff-hand);
+  font-size: var(--f-hand);
+  font-weight: 400;
+  color: var(--c-ink-muted);
+}
+
+/* --- Small text -------------------------------------------- */
+small, .t-small {
+  font-size: var(--f-small);
+  color: var(--c-ink-muted);
+}
+
+/* --- List resets ------------------------------------------- */
+ul, ol {
+  padding-left: var(--s-5);
+}
+
+li {
+  margin-bottom: var(--s-2);
+}
+
+li::marker {
+  color: var(--c-ink-muted);
+}
+
+/* --- Strong / emphasis ------------------------------------- */
+strong {
+  font-weight: 600;
+}
+
+/* --- Selection --------------------------------------------- */
+::selection {
+  background-color: var(--c-violet-tint);
+  color: var(--c-ink);
+}
+

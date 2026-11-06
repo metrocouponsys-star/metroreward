@@ -1,0 +1,62 @@
+.root {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--page);
+  padding: 2rem;
+}
+
+.spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  color: var(--ink-muted);
+}
+
+.errorCard {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sheet);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 360px;
+  width: 100%;
+}
+
+.errorIcon {
+  font-size: 3rem;
+  color: var(--alert);
+  line-height: 1;
+}
+
+.errorText {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.successCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.successIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--success-light);
+  color: var(--success);
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

@@ -1,0 +1,111 @@
+.rewardCard {
+  background: var(--surface);
+  border-radius: var(--radius-ticket);
+  border: 1px solid var(--hairline);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rewardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.rewardTitle {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rewardMeta {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+}
+
+.sourceBadge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 100px;
+  background: var(--page);
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.codeBlock {
+  background: var(--page);
+  border-radius: var(--radius-ticket);
+  padding: 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.codeLabel {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.code {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--violet);
+  font-variant-numeric: tabular-nums;
+  user-select: all;
+}
+
+.codeTimer {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.codeExpired {
+  font-size: 0.875rem;
+  color: var(--alert);
+}
+
+.expiryNote {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.pastItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--hairline);
+  gap: 1rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 100px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.badge[data-status="redeemed"] {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.badge[data-status="expired"] {
+  background: var(--page);
+  color: var(--ink-muted);
+}
+

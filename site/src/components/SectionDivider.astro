@@ -1,0 +1,16 @@
+---
+/**
+ * SectionDivider.astro — Ledger-style section rule with a mono label.
+ */
+interface Props {
+  label: string;
+  id?: string;
+}
+
+const { label, id } = Astro.props;
+---
+
+<div class="divider" id={id}>
+  <span class="divider__label">{label}</span>
+</div>
+

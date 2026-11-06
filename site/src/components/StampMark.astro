@@ -1,0 +1,96 @@
+---
+/**
+ * StampMark.astro — SVG stamp impression with ink bleed effect.
+ * Used sparingly (max 4 across the whole site).
+ */
+interface Props {
+  size?: number;
+  text?: string;
+  rotation?: number;
+  class?: string;
+  animate?: boolean;
+  id?: string;
+}
+
+const {
+  size = 80,
+  text = '✓',
+  rotation = -6,
+  class: className = '',
+  animate = true,
+  id,
+} = Astro.props;
+
+const filterId = `ink-bleed-${id || Math.random().toString(36).slice(2, 6)}`;
+---
+
+<div
+  class:list={['stamp-mark', animate && 'stamp-mark--animate', className]}
+  aria-hidden="true"
+  data-stamp-animate={animate ? 'true' : undefined}
+>
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <defs>
+      <filter id={filterId}>
+        <feTurbulence type="turbulence" baseFrequency="0.035" numOctaves="4" result="noise" seed="7"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+    <g filter={`url(#${filterId})`} transform={`rotate(${rotation}, 50, 50)`}>
+      <!-- Irregular circle -->
+      <path
+        d="M50 6C28 5 8 24 7 50c-1 26 19 45 43 44s44-20 44-44C94 24 72 7 50 6z"
+        stroke="var(--c-violet)"
+        stroke-width="3"
+        fill="var(--c-violet)"
+        opacity="0.12"
+      />
+      <path
+        d="M50 6C28 5 8 24 7 50c-1 26 19 45 43 44s44-20 44-44C94 24 72 7 50 6z"
+        stroke="var(--c-violet)"
+        stroke-width="3"
+        fill="none"
+        opacity="0.85"
+      />
+      <text
+        x="50"
+        y="58"
+        text-anchor="middle"
+        font-family="var(--ff-display)"
+        font-size="28"
+        font-weight="700"
+        fill="var(--c-violet)"
+        opacity="0.85"
+      >{text}</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .stamp-mark {
+    display: inline-block;
+    line-height: 0;
+  }
+
+  .stamp-mark--animate {
+    opacity: 0;
+    transform: scale(1.35) rotate(-8deg);
+    transition: none;
+  }
+
+  .stamp-mark--animate[data-visible="true"] {
+    opacity: 1;
+    transform: scale(1) rotate(-2deg);
+    transition:
+      opacity 0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stamp-mark--animate {
+      opacity: 1;
+      transform: scale(1) rotate(-2deg);
+    }
+  }
+</style>
+

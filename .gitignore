@@ -1,0 +1,13 @@
+node_modules/
+dist/
+web/dist/
+server/dist/
+site/dist/
+site/.astro/
+.vscode/
+.env
+*.js.map
+coverage/
+.DS_Store
+Thumbs.db
+

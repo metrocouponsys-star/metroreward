@@ -1,0 +1,64 @@
+---
+/**
+ * 404.astro — Lost page. Calm, on-brand, with a hand stamp mark.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The page you are looking for does not exist."
+>
+  <section class="lost">
+    <div class="lost__inner container">
+      <div class="lost__stamp" aria-hidden="true">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <defs>
+            <filter id="ink-bleed-404">
+              <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" result="noise" seed="3"/>
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+          <circle cx="60" cy="60" r="48" stroke="var(--c-violet)" stroke-width="4" fill="none" opacity="0.2" filter="url(#ink-bleed-404)" transform="rotate(-6, 60, 60)"/>
+          <text x="60" y="68" text-anchor="middle" font-family="var(--ff-display)" font-size="32" font-weight="700" fill="var(--c-violet)" opacity="0.25" filter="url(#ink-bleed-404)" transform="rotate(-6, 60, 60)">404</text>
+        </svg>
+      </div>
+      <h1 class="lost__title">This page wandered off.</h1>
+      <p class="lost__text">
+        The page you are looking for does not exist, or it has been moved.
+      </p>
+      <a href="/" class="btn btn--primary">Back to home</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100dvh - var(--header-height) - 200px);
+    padding: var(--s-9) 0;
+    text-align: left;
+  }
+
+  .lost__inner {
+    max-width: 32rem;
+  }
+
+  .lost__stamp {
+    margin-bottom: var(--s-5);
+    transform: rotate(-4deg);
+  }
+
+  .lost__title {
+    font-size: var(--f-h2);
+    margin-bottom: var(--s-4);
+  }
+
+  .lost__text {
+    color: var(--c-ink-muted);
+    margin-bottom: var(--s-6);
+  }
+</style>
+

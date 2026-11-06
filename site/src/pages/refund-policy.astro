@@ -1,0 +1,143 @@
+---
+/**
+ * refund-policy.astro
+ * Draft. Have a lawyer review before launch.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/config/site';
+
+const sections = [
+  { id: 'free-pilot', label: 'Free pilot' },
+  { id: 'paid-plans', label: 'Paid plans' },
+  { id: 'how-to-cancel', label: 'How to cancel' },
+  { id: 'refund-process', label: 'Refund process' },
+  { id: 'gst', label: 'GST invoices' },
+  { id: 'contact', label: 'Contact' },
+];
+---
+
+<BaseLayout
+  title="Refund and cancellation policy"
+  description="How to cancel your Stamp plan and request a refund."
+  pageClass="page-policy"
+>
+
+  <article class="policy section" aria-labelledby="refund-heading">
+    <div class="policy__inner container">
+
+      <header class="policy__header">
+        <h1 id="refund-heading" class="policy__title">Refund and cancellation policy</h1>
+        <p class="policy__updated t-mono">Last updated: {site.policyLastUpdated}</p>
+        <div class="policy__summary">
+          <p><strong>In plain words:</strong> The pilot is free. If you are on a paid plan and it is not working for you, contact us and we will sort it out.</p>
+        </div>
+      </header>
+
+      <div class="policy__body-layout">
+        <nav class="policy__toc" aria-label="Table of contents">
+          <span class="policy__toc-label t-mono">Contents</span>
+          <ol class="policy__toc-list">
+            {sections.map(s => (
+              <li><a href={`#${s.id}`} class="policy__toc-link">{s.label}</a></li>
+            ))}
+          </ol>
+        </nav>
+
+        <div class="policy__content">
+
+          <section id="free-pilot">
+            <h2>Free pilot</h2>
+            <p>The pilot is free and has no payment commitment. [[FILL: pilot length, e.g. "It runs for up to 4 weeks."]]</p>
+            <p>You can stop the pilot at any time by contacting us. No payment is involved, so there is nothing to refund.</p>
+          </section>
+
+          <section id="paid-plans">
+            <h2>Paid plans</h2>
+            <p>[[FILL: describe paid plans, whether they are monthly or annual, and whether they are refundable. E.g. "Paid plans are billed monthly. You may cancel at any time and your service continues until the end of the paid period."]]</p>
+            <p>Refund window: [[FILL: e.g. "If you cancel within 7 days of a payment, we will refund the full amount. After 7 days, we do not offer partial refunds, but your service continues until the end of the billing period."]]</p>
+          </section>
+
+          <section id="how-to-cancel">
+            <h2>How to cancel</h2>
+            <p>To cancel your plan or stop the pilot:</p>
+            <ul>
+              <li><a href="/contact">Contact us</a> through the website.</li>
+              <li>WhatsApp us at <a href={`https://wa.me/${site.whatsapp.replace('+', '')}`} target="_blank" rel="noopener noreferrer">{site.whatsapp}</a>.</li>
+              <li>Email <a href={`mailto:${site.email}`}>{site.email}</a>.</li>
+            </ul>
+            <p>We will confirm the cancellation within one working day.</p>
+          </section>
+
+          <section id="refund-process">
+            <h2>Refund process</h2>
+            <p>If you are eligible for a refund:</p>
+            <ol>
+              <li>Contact us with your shop name and the payment you want refunded.</li>
+              <li>We will verify and process the refund within [[FILL: e.g. "5 working days"]].</li>
+              <li>The refund goes back to your original payment method. Bank processing may take an additional [[FILL: e.g. "5–7 working days"]].</li>
+            </ol>
+          </section>
+
+          <section id="gst">
+            <h2>GST invoices</h2>
+            <p>We provide GST invoices for all paid plans. Invoices are sent to your registered email after each payment. If you need a corrected invoice, contact us.</p>
+          </section>
+
+          <section id="contact">
+            <h2>Contact</h2>
+            <p>For refund or cancellation questions:</p>
+            <p>{site.legalEntity}<br/>{site.registeredAddress}<br/><a href={`mailto:${site.email}`}>{site.email}</a><br/>{site.phone}</p>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+</BaseLayout>
+
+<style>
+  .policy { padding-top: calc(var(--header-height) + var(--s-8)); }
+  .policy__title { font-size: var(--f-h1); margin-bottom: var(--s-2); }
+  .policy__updated { color: var(--c-ink-muted); font-size: 0.75rem; margin-bottom: var(--s-5); }
+  .policy__summary { background: var(--c-violet-tint); border-left: 3px solid var(--c-violet); padding: var(--s-4) var(--s-5); border-radius: 0 var(--r-sm) var(--r-sm) 0; margin-bottom: var(--s-7); }
+  .policy__summary p { margin: 0; font-size: var(--f-small); line-height: 1.6; }
+  .policy__body-layout { display: grid; grid-template-columns: 1fr; gap: var(--s-7); }
+  @media (min-width: 64rem) { .policy__body-layout { grid-template-columns: 12rem 1fr; gap: var(--s-8); } }
+  .policy__toc { display: none; }
+  @media (min-width: 64rem) { .policy__toc { display: block; position: sticky; top: calc(var(--header-height) + var(--s-5)); align-self: start; } }
+  .policy__toc-label { display: block; font-size: 0.6875rem; color: var(--c-ink-muted); text-transform: lowercase; letter-spacing: 0.06em; margin-bottom: var(--s-3); }
+  .policy__toc-list { list-style: none; padding: 0; margin: 0; }
+  .policy__toc-list li { margin-bottom: var(--s-1); }
+  .policy__toc-link { font-size: 0.8125rem; color: var(--c-ink-muted); text-decoration: none; padding: var(--s-1) 0; display: block; border-left: 2px solid transparent; padding-left: var(--s-3); transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .policy__toc-link:hover { color: var(--c-violet); }
+  .policy__toc-link.active { color: var(--c-violet); border-left-color: var(--c-violet); font-weight: 500; }
+  .policy__content { max-width: var(--content-narrow); }
+  .policy__content section { margin-bottom: var(--s-7); scroll-margin-top: calc(var(--header-height) + var(--s-5)); }
+  .policy__content h2 { font-size: var(--f-h3); margin-bottom: var(--s-4); padding-bottom: var(--s-2); border-bottom: 1px solid var(--c-hairline); }
+  .policy__content p { color: var(--c-ink-muted); line-height: 1.7; }
+  .policy__content ul, .policy__content ol { padding-left: var(--s-5); color: var(--c-ink-muted); }
+  .policy__content li { line-height: 1.65; margin-bottom: var(--s-2); }
+  .policy__content a { color: var(--c-violet); }
+  @media print { .policy__toc { display: none; } .policy__body-layout { grid-template-columns: 1fr; } }
+</style>
+
+<script is:inline>
+(function () {
+  var tocLinks = document.querySelectorAll('.policy__toc-link');
+  var sections = document.querySelectorAll('.policy__content section[id]');
+  if (!tocLinks.length || !sections.length) return;
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function (l) { l.classList.remove('active'); });
+        var link = document.querySelector('.policy__toc-link[href="#' + entry.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(function (s) { obs.observe(s); });
+})();
+</script>
+

@@ -1,0 +1,103 @@
+.cardGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Paper ticket with perforated left edge */
+.ticket {
+  display: flex;
+  background: var(--surface);
+  border-radius: var(--radius-ticket);
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(16,24,32,0.06), 0 0 0 1px var(--hairline);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+  min-height: 120px;
+  position: relative;
+}
+
+.ticket:hover, .ticket:focus-visible {
+  box-shadow: 0 4px 16px rgba(16,24,32,0.1), 0 0 0 1px var(--hairline);
+}
+
+/* Perforated divider between main and stub */
+.ticket::after {
+  content: '';
+  position: absolute;
+  right: 80px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--hairline) 0,
+    var(--hairline) 6px,
+    transparent 6px,
+    transparent 10px
+  );
+}
+
+.ticketMain {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shopName {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.stampGrid {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.slot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px dashed var(--hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slot.filled {
+  border: none;
+}
+
+.slot svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Stub — right side */
+.ticketStub {
+  width: 80px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: var(--page);
+}
+
+.stubCount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--violet);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+

@@ -1,0 +1,42 @@
+.list { border-top: 1px solid var(--hairline); }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--hairline);
+  gap: 1rem;
+}
+
+.info { flex: 1; }
+
+.name {
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--ink);
+}
+
+.phone {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.meta > div:first-child {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.lastVisit {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+}
+

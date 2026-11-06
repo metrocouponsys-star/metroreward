@@ -1,0 +1,63 @@
+.list { border-top: 1px solid var(--hairline); }
+
+.row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.time {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.1rem;
+}
+
+.customer {}
+
+.name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.phone {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin-top: 0.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.flag {
+  font-size: 0.75rem;
+  color: var(--alert);
+  margin-top: 0.25rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.375rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.badge[data-status="counted"] { background: var(--success-light); color: var(--success); }
+.badge[data-status="pending"] { background: #FFF8E1; color: #A07C00; }
+.badge[data-status="voided"] { background: var(--alert-light); color: var(--alert); }
+
+.approveBtn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  min-height: 32px;
+}
+

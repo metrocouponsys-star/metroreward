@@ -1,0 +1,101 @@
+---
+/**
+ * PlaceholderImage.astro — Hatched placeholder box with aspect ratio.
+ * Shows when the owner hasn't yet dropped an image file.
+ */
+import { getImage, type ImageSlot } from '@/config/images';
+
+interface Props {
+  id: string;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+}
+
+const { id, class: className = '', loading = 'lazy', fetchpriority = 'auto' } = Astro.props;
+const slot = getImage(id);
+const hasFile = Boolean(slot.src);
+---
+
+{hasFile ? (
+  <figure class:list={['img-frame', className]}>
+    <img
+      src={`/images/${slot.src}`}
+      alt={slot.alt}
+      width={slot.width}
+      height={slot.height}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding="async"
+      style={`aspect-ratio: ${slot.aspectRatio};`}
+    />
+    {slot.caption && (
+      <figcaption class="img-frame__caption t-mono">{slot.caption}</figcaption>
+    )}
+  </figure>
+) : (
+  <figure class:list={['img-frame img-frame--placeholder', className]}>
+    <div
+      class="img-frame__hatch"
+      style={`aspect-ratio: ${slot.aspectRatio};`}
+      role="img"
+      aria-label={slot.alt}
+    >
+      <span class="img-frame__id t-mono">{id}</span>
+    </div>
+    {slot.caption && (
+      <figcaption class="img-frame__caption t-mono">{slot.caption}</figcaption>
+    )}
+  </figure>
+)}
+
+<style>
+  .img-frame {
+    margin: 0;
+    position: relative;
+  }
+
+  .img-frame img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border: 1.5px solid var(--c-ink);
+    border-radius: var(--r-sm);
+    display: block;
+  }
+
+  .img-frame__caption {
+    margin-top: var(--s-2);
+    font-size: 0.75rem;
+  }
+
+  /* Placeholder — hatched box */
+  .img-frame__hatch {
+    width: 100%;
+    border: 1.5px dashed var(--c-hairline);
+    border-radius: var(--r-sm);
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 8px,
+        var(--c-hairline) 8px,
+        var(--c-hairline) 9px
+      );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .img-frame__id {
+    background: var(--c-page);
+    padding: var(--s-1) var(--s-3);
+    border-radius: var(--r-sm);
+    font-size: 0.6875rem;
+    color: var(--c-ink-muted);
+    border: 1px solid var(--c-hairline);
+  }
+</style>
+
