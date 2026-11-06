@@ -15,6 +15,14 @@ console.log('📍 Process cwd:', process.cwd());
 console.log('📍 Process PORT:', process.env.PORT);
 console.log('📍 Database URL configured:', Boolean(process.env.DATABASE_URL));
 
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('💥 Unhandled Rejection:', reason);
+});
+
 const compiledServer = join(__dirname, 'server', 'dist', 'index.js');
 const sourceServer = join(__dirname, 'server', 'src', 'index.ts');
 
