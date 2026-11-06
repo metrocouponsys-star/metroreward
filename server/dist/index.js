@@ -1086,9 +1086,9 @@ var VerifyOtpBody = z2.object({
   code: z2.string().length(6),
   name: z2.string().max(128).optional()
 });
-async function authRoutes(app2) {
+async function authRoutes(app) {
   const db = getDb();
-  app2.post("/auth/otp/request", async (req, reply) => {
+  app.post("/auth/otp/request", async (req, reply) => {
     const body = RequestOtpBody.safeParse(req.body);
     if (!body.success) {
       return reply.code(400).send({ error: { code: "VALIDATION", message: "Invalid phone number." } });
@@ -1108,7 +1108,7 @@ async function authRoutes(app2) {
     }
     return reply.send({ ok: true });
   });
-  app2.post("/auth/otp/verify", async (req, reply) => {
+  app.post("/auth/otp/verify", async (req, reply) => {
     const body = VerifyOtpBody.safeParse(req.body);
     if (!body.success) {
       return reply.code(400).send({ error: { code: "VALIDATION", message: "Invalid input." } });
@@ -1172,11 +1172,11 @@ async function authRoutes(app2) {
       isNew
     });
   });
-  app2.post("/auth/logout", async (_req, reply) => {
+  app.post("/auth/logout", async (_req, reply) => {
     clearSessionCookie(reply);
     return reply.send({ ok: true });
   });
-  app2.get("/me", async (req, reply) => {
+  app.get("/me", async (req, reply) => {
     const session = getSession(req);
     if (!session) {
       return reply.code(401).send({ error: { code: "NOT_AUTHENTICATED", message: "Sign in to continue." } });
@@ -1204,9 +1204,9 @@ var ScanBody = z3.object({
   lat: z3.number().optional(),
   lng: z3.number().optional()
 });
-async function scanRoutes(app2) {
+async function scanRoutes(app) {
   const db = getDb();
-  app2.post(
+  app.post(
     "/scan",
     {
       config: {
@@ -1280,9 +1280,9 @@ async function scanRoutes(app2) {
 import { and as and5, eq as eq6, desc } from "drizzle-orm";
 init_schema();
 init_stamp();
-async function customerRoutes(app2) {
+async function customerRoutes(app) {
   const db = getDb();
-  app2.get("/cards", async (req, reply) => {
+  app.get("/cards", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1306,7 +1306,7 @@ async function customerRoutes(app2) {
     );
     return reply.send({ cards: cards.filter(Boolean) });
   });
-  app2.get("/cards/:slug", async (req, reply) => {
+  app.get("/cards/:slug", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1334,7 +1334,7 @@ async function customerRoutes(app2) {
       recentStamps
     });
   });
-  app2.get("/rewards", async (req, reply) => {
+  app.get("/rewards", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1348,7 +1348,7 @@ async function customerRoutes(app2) {
     );
     return reply.send({ rewards: enriched });
   });
-  app2.post("/rewards/:id/claim", async (req, reply) => {
+  app.post("/rewards/:id/claim", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1381,7 +1381,7 @@ async function customerRoutes(app2) {
       title: reward.title
     });
   });
-  app2.get("/scratch/:id", async (req, reply) => {
+  app.get("/scratch/:id", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1405,7 +1405,7 @@ async function customerRoutes(app2) {
       createdAt: card.createdAt
     });
   });
-  app2.post("/scratch/:id/reveal", async (req, reply) => {
+  app.post("/scratch/:id/reveal", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1426,7 +1426,7 @@ async function customerRoutes(app2) {
       rewardId: card.rewardId
     });
   });
-  app2.post("/push/subscribe", async (req, reply) => {
+  app.post("/push/subscribe", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1442,7 +1442,7 @@ async function customerRoutes(app2) {
     });
     return reply.send({ ok: true });
   });
-  app2.post("/shops/:slug/mute", async (req, reply) => {
+  app.post("/shops/:slug/mute", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1454,7 +1454,7 @@ async function customerRoutes(app2) {
     await db.insert(reminderMutes2).ignore().values({ customerId: session.customerId, shopId: shop.id });
     return reply.send({ ok: true });
   });
-  app2.get("/customer/qr-token", async (req, reply) => {
+  app.get("/customer/qr-token", async (req, reply) => {
     const session = getSession(req);
     if (!requireAuth(session, reply))
       return;
@@ -1469,7 +1469,7 @@ async function customerRoutes(app2) {
       phone: customer?.phone || session.phone
     });
   });
-  app2.get("/shops/public", async (_req, reply) => {
+  app.get("/shops/public", async (_req, reply) => {
     const activeShops = await db.select({
       id: shops.id,
       name: shops.name,
@@ -1507,7 +1507,7 @@ var ScratchPrizeSchema = z4.object({
   isNoPrize: z4.boolean(),
   isActive: z4.boolean()
 });
-async function shopRoutes(app2) {
+async function shopRoutes(app) {
   const db = getDb();
   async function getShopForSession(req, reply) {
     const session = getSession(req);
@@ -1521,7 +1521,7 @@ async function shopRoutes(app2) {
     const [shop] = await db.select().from(shops).where(eq7(shops.id, shopId)).limit(1);
     return shop ?? null;
   }
-  app2.get("/shop/qr-token", async (req, reply) => {
+  app.get("/shop/qr-token", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1529,7 +1529,7 @@ async function shopRoutes(app2) {
     const qrUrl = `${process.env.BASE_URL}/s/${shop.slug}?t=${token}`;
     return reply.send({ token, qrUrl, shopName: shop.name, shopSlug: shop.slug });
   });
-  app2.post("/shop/scan-customer", async (req, reply) => {
+  app.post("/shop/scan-customer", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1574,7 +1574,7 @@ async function shopRoutes(app2) {
       scratchCardId: result.scratchCardId
     });
   });
-  app2.get("/shop/feed", async (req, reply) => {
+  app.get("/shop/feed", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1592,7 +1592,7 @@ async function shopRoutes(app2) {
     }).from(stampEvents).leftJoin(customers2, eq7(stampEvents.customerId, customers2.id)).where(and6(eq7(stampEvents.shopId, shop.id), gte3(stampEvents.createdAt, sinceDate))).orderBy(desc2(stampEvents.createdAt)).limit(100);
     return reply.send({ events });
   });
-  app2.get("/shop/summary", async (req, reply) => {
+  app.get("/shop/summary", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1607,7 +1607,7 @@ async function shopRoutes(app2) {
       scratchWinsToday: scratchWins?.c ?? 0
     });
   });
-  app2.get("/shop/customers", async (req, reply) => {
+  app.get("/shop/customers", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1620,7 +1620,7 @@ async function shopRoutes(app2) {
     }).from(stampEvents).leftJoin(customers2, eq7(stampEvents.customerId, customers2.id)).where(and6(eq7(stampEvents.shopId, shop.id), eq7(stampEvents.status, "counted"))).groupBy(stampEvents.customerId, customers2.name, customers2.phone).orderBy(sql4`MAX(${stampEvents.createdAt}) DESC`);
     return reply.send({ customers: rows });
   });
-  app2.get("/shop/customers/export.csv", async (req, reply) => {
+  app.get("/shop/customers/export.csv", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1652,7 +1652,7 @@ async function shopRoutes(app2) {
     reply.header("Content-Disposition", `attachment; filename="${shop.slug}-customers-${dateStr}.csv"`);
     return reply.send(csvContent);
   });
-  app2.post("/shop/redeem", async (req, reply) => {
+  app.post("/shop/redeem", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1682,7 +1682,7 @@ async function shopRoutes(app2) {
     });
     return reply.send({ ok: true, reward });
   });
-  app2.post("/shop/stamps/:id/approve", async (req, reply) => {
+  app.post("/shop/stamps/:id/approve", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1695,7 +1695,7 @@ async function shopRoutes(app2) {
     await writeAudit(db, { actorType: "shop", actorId: shop.id, action: "stamp_approve", detail: { stampId: id } });
     return reply.send({ ok: true });
   });
-  app2.post("/shop/stamps/:id/void", async (req, reply) => {
+  app.post("/shop/stamps/:id/void", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1715,14 +1715,14 @@ async function shopRoutes(app2) {
     await writeAudit(db, { actorType: "shop", actorId: shop.id, action: "stamp_void", detail: { stampId: id, reason } });
     return reply.send({ ok: true });
   });
-  app2.get("/shop/program", async (req, reply) => {
+  app.get("/shop/program", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
     const [prog] = await db.select().from(programs).where(eq7(programs.shopId, shop.id)).limit(1);
     return reply.send({ program: prog ?? null });
   });
-  app2.put("/shop/program", async (req, reply) => {
+  app.put("/shop/program", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1740,7 +1740,7 @@ async function shopRoutes(app2) {
     await writeAudit(db, { actorType: "shop", actorId: shop.id, action: "program_update", detail: body.data });
     return reply.send({ ok: true });
   });
-  app2.get("/shop/scratch-prizes", async (req, reply) => {
+  app.get("/shop/scratch-prizes", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1752,7 +1752,7 @@ async function shopRoutes(app2) {
     }));
     return reply.send({ prizes: enriched });
   });
-  app2.put("/shop/scratch-prizes", async (req, reply) => {
+  app.put("/shop/scratch-prizes", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
     if (!shop)
       return;
@@ -1796,9 +1796,9 @@ var CreateShopBody = z5.object({
   lat: z5.number().optional(),
   lng: z5.number().optional()
 });
-async function adminRoutes(app2) {
+async function adminRoutes(app) {
   const db = getDb();
-  app2.post("/admin/shops", async (req, reply) => {
+  app.post("/admin/shops", async (req, reply) => {
     const session = getSession(req);
     if (!requireRole(session, "admin", reply))
       return;
@@ -1841,14 +1841,14 @@ async function adminRoutes(app2) {
     });
     return reply.code(201).send({ ok: true, shopId });
   });
-  app2.get("/admin/shops", async (req, reply) => {
+  app.get("/admin/shops", async (req, reply) => {
     const session = getSession(req);
     if (!requireRole(session, "admin", reply))
       return;
     const allShops = await db.select().from(shops).orderBy(desc3(shops.createdAt));
     return reply.send({ shops: allShops });
   });
-  app2.post("/admin/shops/:id/deactivate", async (req, reply) => {
+  app.post("/admin/shops/:id/deactivate", async (req, reply) => {
     const session = getSession(req);
     if (!requireRole(session, "admin", reply))
       return;
@@ -1862,7 +1862,7 @@ async function adminRoutes(app2) {
     });
     return reply.send({ ok: true });
   });
-  app2.get("/admin/flags", async (req, reply) => {
+  app.get("/admin/flags", async (req, reply) => {
     const session = getSession(req);
     if (!requireRole(session, "admin", reply))
       return;
@@ -2065,9 +2065,9 @@ var contactSchema = z6.object({
 function hashIp(ip) {
   return createHash("sha256").update(ip).digest("hex");
 }
-async function contactRoutes(app2) {
+async function contactRoutes(app) {
   const db = getDb();
-  app2.post("/public/contact", async (request, reply) => {
+  app.post("/public/contact", async (request, reply) => {
     const siteOrigin = env.SITE_ORIGIN || "";
     if (siteOrigin) {
       reply.header("Access-Control-Allow-Origin", siteOrigin);
@@ -2134,7 +2134,7 @@ async function contactRoutes(app2) {
     }
     return reply.status(201).send({ ok: true });
   });
-  app2.options("/public/contact", async (_request, reply) => {
+  app.options("/public/contact", async (_request, reply) => {
     const siteOrigin = env.SITE_ORIGIN || "";
     if (siteOrigin) {
       reply.header("Access-Control-Allow-Origin", siteOrigin);
@@ -2152,9 +2152,9 @@ async function cleanupOldContactRequests() {
 }
 
 // src/routes/cron.ts
-async function cronRoutes(app2) {
+async function cronRoutes(app) {
   const db = getDb();
-  app2.post("/internal/cron/reminders", async (req, reply) => {
+  app.post("/internal/cron/reminders", async (req, reply) => {
     const secret = req.headers["x-cron-secret"];
     if (secret !== env.CRON_SECRET) {
       return reply.code(401).send({ error: { code: "FORBIDDEN", message: "Invalid cron secret." } });
@@ -2167,89 +2167,99 @@ async function cronRoutes(app2) {
 
 // src/index.ts
 var __dirname = dirname(fileURLToPath(import.meta.url));
-var app = Fastify({
-  logger: { level: env.NODE_ENV === "production" ? "info" : "debug" },
-  trustProxy: true
-});
-await app.register(helmet, {
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'"],
-      workerSrc: ["'self'", "blob:"]
+async function start() {
+  const app = Fastify({
+    logger: { level: env.NODE_ENV === "production" ? "info" : "debug" },
+    trustProxy: true
+  });
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        connectSrc: ["'self'"],
+        workerSrc: ["'self'", "blob:"]
+      }
     }
-  }
-});
-await app.register(cookie, { secret: env.SESSION_SECRET });
-await app.register(rateLimit, {
-  global: false,
-  max: 300,
-  timeWindow: "1 minute",
-  errorResponseBuilder: () => ({
-    error: { code: "RATE_LIMITED", message: "Too many requests. Wait a moment and try again." }
-  })
-});
-await app.register(
-  async (api) => {
-    await authRoutes(api);
-    await scanRoutes(api);
-    await customerRoutes(api);
-    await shopRoutes(api);
-    await adminRoutes(api);
-    await cronRoutes(api);
-    await contactRoutes(api);
-    api.get("/health", async () => ({
-      ok: true,
-      ts: (/* @__PURE__ */ new Date()).toISOString(),
-      env: env.NODE_ENV
-    }));
-  },
-  { prefix: "/api" }
-);
-app.get("/health", async () => ({
-  ok: true,
-  status: "healthy",
-  db: dbReady ? "configured" : "missing-DATABASE_URL",
-  ts: (/* @__PURE__ */ new Date()).toISOString()
-}));
-var webDist = existsSync(join(process.cwd(), "web/dist")) ? join(process.cwd(), "web/dist") : join(__dirname, "../../web/dist");
-if (existsSync(webDist)) {
-  await app.register(fastifyStatic, {
-    root: webDist,
-    wildcard: false
   });
-  app.setNotFoundHandler((req, reply) => {
-    if (req.raw.url?.startsWith("/api")) {
-      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found." } });
-    }
-    reply.sendFile("index.html", webDist);
+  await app.register(cookie, { secret: env.SESSION_SECRET });
+  await app.register(rateLimit, {
+    global: false,
+    max: 300,
+    timeWindow: "1 minute",
+    errorResponseBuilder: () => ({
+      error: { code: "RATE_LIMITED", message: "Too many requests. Wait a moment and try again." }
+    })
   });
-} else {
-  app.setNotFoundHandler((_req, reply) => {
-    reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
-  });
-}
-var portOrSocket = resolvePort();
-console.log(`\u{1F680} Starting Stamp \u2014 PORT env="${process.env.PORT || env.PORT}" resolved="${portOrSocket}" db=${dbReady ? "ready" : "NOT SET"}`);
-try {
-  if (typeof portOrSocket === "string" && isNaN(Number(portOrSocket))) {
-    await app.listen({ path: portOrSocket });
-    console.log(`\u2705 Stamp server listening on socket ${portOrSocket}`);
+  await app.register(
+    async (api) => {
+      await authRoutes(api);
+      await scanRoutes(api);
+      await customerRoutes(api);
+      await shopRoutes(api);
+      await adminRoutes(api);
+      await cronRoutes(api);
+      await contactRoutes(api);
+      api.get("/health", async () => ({
+        ok: true,
+        ts: (/* @__PURE__ */ new Date()).toISOString(),
+        env: env.NODE_ENV
+      }));
+    },
+    { prefix: "/api" }
+  );
+  app.get("/health", async () => ({
+    ok: true,
+    status: "healthy",
+    db: dbReady ? "configured" : "missing-DATABASE_URL",
+    ts: (/* @__PURE__ */ new Date()).toISOString()
+  }));
+  const webDist = existsSync(join(process.cwd(), "web/dist")) ? join(process.cwd(), "web/dist") : join(__dirname, "../../web/dist");
+  if (existsSync(webDist)) {
+    await app.register(fastifyStatic, {
+      root: webDist,
+      wildcard: false
+    });
+    app.setNotFoundHandler((req, reply) => {
+      if (req.raw.url?.startsWith("/api")) {
+        return reply.code(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found." } });
+      }
+      reply.sendFile("index.html", webDist);
+    });
   } else {
-    const port = typeof portOrSocket === "number" ? portOrSocket : parseInt(portOrSocket, 10) || 3e3;
-    try {
-      await app.listen({ port, host: "0.0.0.0" });
-      console.log(`\u2705 Stamp server listening on 0.0.0.0:${port}`);
-    } catch {
-      await app.listen({ port });
-      console.log(`\u2705 Stamp server listening on port ${port}`);
-    }
+    app.setNotFoundHandler((_req, reply) => {
+      reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
+    });
   }
-} catch (err) {
-  app.log.error(err);
-  console.error("\u274C Fastify app.listen failed:", err);
-  process.exit(1);
+  const portOrSocket = resolvePort();
+  console.log(`\u{1F680} Starting Stamp \u2014 PORT env="${process.env.PORT || env.PORT}" resolved="${portOrSocket}" db=${dbReady ? "ready" : "NOT SET"}`);
+  try {
+    if (typeof portOrSocket === "string" && isNaN(Number(portOrSocket))) {
+      await app.listen({ path: portOrSocket });
+      console.log(`\u2705 Stamp server listening on socket ${portOrSocket}`);
+    } else {
+      const port = typeof portOrSocket === "number" ? portOrSocket : parseInt(portOrSocket, 10) || 3e3;
+      try {
+        await app.listen({ port, host: "0.0.0.0" });
+        console.log(`\u2705 Stamp server listening on 0.0.0.0:${port}`);
+      } catch {
+        await app.listen({ port });
+        console.log(`\u2705 Stamp server listening on port ${port}`);
+      }
+    }
+  } catch (err) {
+    app.log.error(err);
+    console.error("\u274C Fastify app.listen failed:", err);
+    process.exit(1);
+  }
+  return app;
 }
+start().catch((err) => {
+  console.error("\u274C Fatal error during server startup:", err);
+  process.exit(1);
+});
+export {
+  start
+};
