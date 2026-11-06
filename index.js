@@ -4,3 +4,4 @@
  */
 import 'tsx';
 await import('./server/src/index.ts');
+
