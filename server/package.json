@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "echo 'Server runs with tsx - no build step needed'",
+    "build": "esbuild src/index.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/index.js --packages=external",
     "start": "tsx src/index.ts",
+    "start:dist": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
@@ -23,6 +24,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/web-push": "^3.6.3",
     "drizzle-orm": "^0.44.1",
+    "esbuild": "^0.24.0",
     "fastify": "^5.4.0",
     "mysql2": "^3.11.5",
     "nanoid": "^5.0.9",

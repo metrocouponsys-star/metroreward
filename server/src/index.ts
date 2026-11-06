@@ -68,16 +68,25 @@ await app.register(
   { prefix: '/api' },
 );
 
+// ── Health probe ─────────────────────────────────────────────────────────────
+app.get('/health', async () => ({ ok: true, status: 'healthy', ts: new Date().toISOString() }));
+
 // ── Serve built web app ───────────────────────────────────────────────────────
-const webDist = join(__dirname, '../../web/dist');
+const webDist = existsSync(join(process.cwd(), 'web/dist'))
+  ? join(process.cwd(), 'web/dist')
+  : join(__dirname, '../../web/dist');
+
 if (existsSync(webDist)) {
   await app.register(fastifyStatic, {
     root: webDist,
     wildcard: false,
   });
 
-  // SPA fallback
-  app.setNotFoundHandler((_req, reply) => {
+  // SPA fallback (send index.html for non-API routes)
+  app.setNotFoundHandler((req, reply) => {
+    if (req.raw.url?.startsWith('/api')) {
+      return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'API endpoint not found.' } });
+    }
     reply.sendFile('index.html', webDist);
   });
 } else {
