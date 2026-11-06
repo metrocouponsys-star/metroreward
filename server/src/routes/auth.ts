@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { getDb } from '../db/client.ts';
+import { getDb, getPool, ensureTables } from '../db/client.ts';
 import { customers, shops } from '../db/schema.ts';
 import { requestOtp, verifyOtp } from '../services/otp.ts';
 import {
@@ -35,19 +35,28 @@ export async function authRoutes(app: FastifyInstance) {
     const phone = normalizePhone(body.data.phone);
     const ip = req.ip;
 
-    const result = await requestOtp(db, phone, ip);
-    if (!result.ok) {
-      const statusMap: Record<string, number> = {
-        OTP_LOCKED: 429,
-        OTP_RATE_LIMIT: 429,
-        OTP_RESEND_TOO_SOON: 429,
-      };
-      return reply.code(statusMap[result.code] ?? 400).send({
-        error: { code: result.code, message: result.code },
+    try {
+      await ensureTables(getPool());
+      const result = await requestOtp(db, phone, ip);
+      if (!result.ok) {
+        const statusMap: Record<string, number> = {
+          OTP_LOCKED: 429,
+          OTP_RATE_LIMIT: 429,
+          OTP_RESEND_TOO_SOON: 429,
+        };
+        return reply.code(statusMap[result.code] ?? 400).send({
+          error: { code: result.code, message: result.code },
+        });
+      }
+
+      return reply.send({ ok: true });
+    } catch (err: any) {
+      req.log.error(err);
+      console.error('❌ OTP request DB error:', err);
+      return reply.code(500).send({
+        error: { code: 'INTERNAL_ERROR', message: err?.message || 'Database error during OTP request' },
       });
     }
-
-    return reply.send({ ok: true });
   });
 
   // POST /api/auth/otp/verify
