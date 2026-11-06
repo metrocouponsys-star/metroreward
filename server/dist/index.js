@@ -2056,7 +2056,25 @@ var CreateShopBody = z5.object({
   name: z5.string().min(1).max(128),
   ownerPhone: z5.string().min(10).max(20),
   lat: z5.number().optional(),
-  lng: z5.number().optional()
+  lng: z5.number().optional(),
+  stampsRequired: z5.number().int().min(2).max(30).optional(),
+  rewardText: z5.string().max(256).optional(),
+  cooldownMinutes: z5.number().int().min(0).max(1440).optional(),
+  maxStampsPerDay: z5.number().int().min(1).max(20).optional(),
+  scratchEnabled: z5.boolean().optional()
+});
+var UpdateShopBody = z5.object({
+  slug: z5.string().min(2).max(64).regex(/^[a-z0-9-]+$/).optional(),
+  name: z5.string().min(1).max(128).optional(),
+  ownerPhone: z5.string().min(10).max(20).optional(),
+  lat: z5.number().optional(),
+  lng: z5.number().optional(),
+  isActive: z5.boolean().optional(),
+  stampsRequired: z5.number().int().min(2).max(30).optional(),
+  rewardText: z5.string().max(256).optional(),
+  cooldownMinutes: z5.number().int().min(0).max(1440).optional(),
+  maxStampsPerDay: z5.number().int().min(1).max(20).optional(),
+  scratchEnabled: z5.boolean().optional()
 });
 async function adminRoutes(app) {
   const db = getDb();
@@ -2086,15 +2104,44 @@ async function adminRoutes(app) {
     await db.insert(programs).values({
       id: uuid(),
       shopId,
-      stampsRequired: 8,
-      rewardText: "Stamp card reward",
-      cooldownMinutes: 360,
-      maxStampsPerDay: 2,
+      stampsRequired: body.data.stampsRequired ?? 6,
+      rewardText: body.data.rewardText || "Free item or reward of your choice",
+      cooldownMinutes: body.data.cooldownMinutes ?? 60,
+      maxStampsPerDay: body.data.maxStampsPerDay ?? 2,
       requireApproval: false,
-      scratchEnabled: true,
+      scratchEnabled: body.data.scratchEnabled ?? true,
       scratchEveryNVisits: 1,
       prizeExpiryDays: 30
     });
+    await db.insert(scratchPrizes).values([
+      {
+        id: uuid(),
+        shopId,
+        title: "15% Off Your Next Order",
+        weight: 50,
+        stock: null,
+        isNoPrize: false,
+        isActive: true
+      },
+      {
+        id: uuid(),
+        shopId,
+        title: "Free Treat / Special Perk",
+        weight: 30,
+        stock: 50,
+        isNoPrize: false,
+        isActive: true
+      },
+      {
+        id: uuid(),
+        shopId,
+        title: "Better luck next visit!",
+        weight: 20,
+        stock: null,
+        isNoPrize: true,
+        isActive: true
+      }
+    ]);
     await writeAudit(db, {
       actorType: "admin",
       actorId: session.customerId,
@@ -2102,6 +2149,101 @@ async function adminRoutes(app) {
       detail: { shopId, slug: body.data.slug, name: body.data.name }
     });
     return reply.code(201).send({ ok: true, shopId });
+  });
+  app.get("/admin/shops/:id", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const { id } = req.params;
+    const [shop] = await db.select().from(shops).where(eq8(shops.id, id)).limit(1);
+    if (!shop)
+      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "Shop not found." } });
+    const [prog] = await db.select().from(programs).where(eq8(programs.shopId, id)).limit(1);
+    const prizes = await db.select().from(scratchPrizes).where(eq8(scratchPrizes.shopId, id));
+    const [memberCountRow] = await db.select({ c: sql5`COUNT(DISTINCT ${stampEvents.customerId})` }).from(stampEvents).where(and7(eq8(stampEvents.shopId, id), eq8(stampEvents.status, "counted")));
+    const [stampsCountRow] = await db.select({ c: count4() }).from(stampEvents).where(and7(eq8(stampEvents.shopId, id), eq8(stampEvents.status, "counted")));
+    return reply.send({
+      shop,
+      program: prog,
+      scratchPrizes: prizes,
+      memberCount: Number(memberCountRow?.c ?? 0),
+      totalStamps: Number(stampsCountRow?.c ?? 0)
+    });
+  });
+  app.put("/admin/shops/:id", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const { id } = req.params;
+    const [shop] = await db.select().from(shops).where(eq8(shops.id, id)).limit(1);
+    if (!shop)
+      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "Shop not found." } });
+    const body = UpdateShopBody.safeParse(req.body);
+    if (!body.success) {
+      return reply.code(400).send({ error: { code: "VALIDATION", message: "Invalid data.", details: body.error.flatten() } });
+    }
+    const { normalizePhone: normalizePhone2 } = await Promise.resolve().then(() => (init_utils(), utils_exports));
+    const shopUpdates = {};
+    if (body.data.name)
+      shopUpdates.name = body.data.name;
+    if (body.data.slug)
+      shopUpdates.slug = body.data.slug;
+    if (body.data.ownerPhone)
+      shopUpdates.ownerPhone = normalizePhone2(body.data.ownerPhone);
+    if (body.data.lat !== void 0)
+      shopUpdates.lat = body.data.lat;
+    if (body.data.lng !== void 0)
+      shopUpdates.lng = body.data.lng;
+    if (body.data.isActive !== void 0)
+      shopUpdates.isActive = body.data.isActive;
+    if (Object.keys(shopUpdates).length > 0) {
+      await db.update(shops).set(shopUpdates).where(eq8(shops.id, id));
+    }
+    const progUpdates = {};
+    if (body.data.stampsRequired !== void 0)
+      progUpdates.stampsRequired = body.data.stampsRequired;
+    if (body.data.rewardText !== void 0)
+      progUpdates.rewardText = body.data.rewardText;
+    if (body.data.cooldownMinutes !== void 0)
+      progUpdates.cooldownMinutes = body.data.cooldownMinutes;
+    if (body.data.maxStampsPerDay !== void 0)
+      progUpdates.maxStampsPerDay = body.data.maxStampsPerDay;
+    if (body.data.scratchEnabled !== void 0)
+      progUpdates.scratchEnabled = body.data.scratchEnabled;
+    if (Object.keys(progUpdates).length > 0) {
+      await db.update(programs).set(progUpdates).where(eq8(programs.shopId, id));
+    }
+    await writeAudit(db, {
+      actorType: "admin",
+      actorId: session.customerId,
+      action: "shop_update",
+      detail: { shopId: id, updates: body.data }
+    });
+    return reply.send({ ok: true });
+  });
+  app.delete("/admin/shops/:id", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const { id } = req.params;
+    const [shop] = await db.select().from(shops).where(eq8(shops.id, id)).limit(1);
+    if (!shop)
+      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "Shop not found." } });
+    await db.delete(scratchCards).where(eq8(scratchCards.shopId, id));
+    await db.delete(scratchPrizes).where(eq8(scratchPrizes.shopId, id));
+    await db.delete(rewards).where(eq8(rewards.shopId, id));
+    await db.delete(stampEvents).where(eq8(stampEvents.shopId, id));
+    await db.delete(programs).where(eq8(programs.shopId, id));
+    await db.delete(reminders).where(eq8(reminders.shopId, id));
+    await db.delete(reminderMutes).where(eq8(reminderMutes.shopId, id));
+    await db.delete(shops).where(eq8(shops.id, id));
+    await writeAudit(db, {
+      actorType: "admin",
+      actorId: session.customerId,
+      action: "shop_delete",
+      detail: { shopId: id, shopName: shop.name }
+    });
+    return reply.send({ ok: true });
   });
   app.get("/admin/stats", async (req, reply) => {
     const session = getSession(req);
