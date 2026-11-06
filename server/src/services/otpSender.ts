@@ -34,5 +34,7 @@ class HttpSender implements OtpSender {
 }
 
 export const otpSender: OtpSender =
-  env.NODE_ENV === 'production' ? new HttpSender() : new ConsoleSender();
+  (env.NODE_ENV === 'production' && Boolean(env.OTP_PROVIDER_URL))
+    ? new HttpSender()
+    : new ConsoleSender();
 
