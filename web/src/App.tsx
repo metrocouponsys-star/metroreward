@@ -5,9 +5,10 @@ import '@fontsource/figtree/500.css';
 import '@fontsource/figtree/600.css';
 import './styles/globals.css';
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './hooks/useAuth.tsx';
+import { AdminShopBar } from './components/AdminShopBar.tsx';
 
 // Lazy page imports
 import { lazy, Suspense } from 'react';
@@ -49,6 +50,15 @@ function LoadingScreen() {
   );
 }
 
+function ShopLayout() {
+  return (
+    <>
+      <AdminShopBar />
+      <Outlet />
+    </>
+  );
+}
+
 function AppRoutes() {
   const { user, loading } = useAuth();
 
@@ -81,14 +91,16 @@ function AppRoutes() {
             <Route path="/admin" element={<AdminShopsPage />} />
             <Route path="/admin/create-shop" element={<AdminCreateShopPage />} />
             <Route path="/admin/flags" element={<AdminFlagsPage />} />
-            <Route path="/shop" element={<ShopDashboardPage />} />
-            <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
-            <Route path="/shop/print-qr" element={<PrintQrPage />} />
-            <Route path="/shop/qr" element={<ShopQrPage />} />
-            <Route path="/shop/feed" element={<ShopFeedPage />} />
-            <Route path="/shop/redeem" element={<ShopRedeemPage />} />
-            <Route path="/shop/customers" element={<ShopCustomersPage />} />
-            <Route path="/shop/program" element={<ShopProgramPage />} />
+            <Route element={<ShopLayout />}>
+              <Route path="/shop" element={<ShopDashboardPage />} />
+              <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
+              <Route path="/shop/print-qr" element={<PrintQrPage />} />
+              <Route path="/shop/qr" element={<ShopQrPage />} />
+              <Route path="/shop/feed" element={<ShopFeedPage />} />
+              <Route path="/shop/redeem" element={<ShopRedeemPage />} />
+              <Route path="/shop/customers" element={<ShopCustomersPage />} />
+              <Route path="/shop/program" element={<ShopProgramPage />} />
+            </Route>
           </>
         )}
 
@@ -96,14 +108,16 @@ function AppRoutes() {
         {user?.role === 'shop' && (
           <>
             <Route path="/" element={<Navigate to="/shop" replace />} />
-            <Route path="/shop" element={<ShopDashboardPage />} />
-            <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
-            <Route path="/shop/print-qr" element={<PrintQrPage />} />
-            <Route path="/shop/qr" element={<ShopQrPage />} />
-            <Route path="/shop/feed" element={<ShopFeedPage />} />
-            <Route path="/shop/redeem" element={<ShopRedeemPage />} />
-            <Route path="/shop/customers" element={<ShopCustomersPage />} />
-            <Route path="/shop/program" element={<ShopProgramPage />} />
+            <Route element={<ShopLayout />}>
+              <Route path="/shop" element={<ShopDashboardPage />} />
+              <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
+              <Route path="/shop/print-qr" element={<PrintQrPage />} />
+              <Route path="/shop/qr" element={<ShopQrPage />} />
+              <Route path="/shop/feed" element={<ShopFeedPage />} />
+              <Route path="/shop/redeem" element={<ShopRedeemPage />} />
+              <Route path="/shop/customers" element={<ShopCustomersPage />} />
+              <Route path="/shop/program" element={<ShopProgramPage />} />
+            </Route>
           </>
         )}
 

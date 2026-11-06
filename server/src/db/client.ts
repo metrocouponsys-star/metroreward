@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
+import { randomBytes } from 'node:crypto';
 import { env, dbReady } from '../lib/env.ts';
 import * as schema from './schema.ts';
 
@@ -174,9 +175,72 @@ export async function ensureTables(pool: mysql.Pool) {
       await pool.query(sql);
     }
     console.log('✅ MySQL schema verified: All 13 tables ready.');
+    await ensureSeed(pool);
   } catch (err) {
     console.error('⚠️ Failed to ensure MySQL tables:', err);
     _tablesEnsured = false;
+  }
+}
+
+async function ensureSeed(pool: mysql.Pool) {
+  try {
+    const [rows] = await pool.query('SELECT COUNT(*) as cnt FROM `shops`');
+    const count = (rows as any)?.[0]?.cnt ?? 0;
+    if (count === 0) {
+      console.log('🌱 Seeding initial demo merchants for multi-merchant management...');
+      const secret1 = randomBytes(32);
+      const secret2 = randomBytes(32);
+
+      const shop1Id = '01a10000-0000-0000-0000-000000000001';
+      const prog1Id = '01a10000-0000-0000-0000-000000000002';
+      await pool.query(
+        'INSERT INTO `shops` (`id`, `slug`, `name`, `owner_phone`, `lat`, `lng`, `qr_secret`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [shop1Id, 'metro-cafe', 'Metro Cafe & Bakery', '+919029999614', 19.0760, 72.8777, secret1, 1],
+      );
+      await pool.query(
+        'INSERT INTO `programs` (`id`, `shop_id`, `stamps_required`, `reward_text`, `cooldown_minutes`, `max_stamps_per_day`, `scratch_enabled`, `scratch_every_n_visits`, `prize_expiry_days`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [prog1Id, shop1Id, 6, 'Free Artisanal Beverage or Croissant', 60, 2, 1, 1, 30],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000003', shop1Id, '15% Off Total Bill', 50, null, 0, 1],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000004', shop1Id, 'Free Cookie on ₹200+ Order', 30, 50, 0, 1],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000005', shop1Id, 'Better luck next visit!', 20, null, 1, 1],
+      );
+
+      const shop2Id = '01a10000-0000-0000-0000-000000000010';
+      const prog2Id = '01a10000-0000-0000-0000-000000000011';
+      await pool.query(
+        'INSERT INTO `shops` (`id`, `slug`, `name`, `owner_phone`, `lat`, `lng`, `qr_secret`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [shop2Id, 'urban-salon', 'Urban Cuts & Spa', '+919820099999', 19.1136, 72.8697, secret2, 1],
+      );
+      await pool.query(
+        'INSERT INTO `programs` (`id`, `shop_id`, `stamps_required`, `reward_text`, `cooldown_minutes`, `max_stamps_per_day`, `scratch_enabled`, `scratch_every_n_visits`, `prize_expiry_days`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [prog2Id, shop2Id, 5, 'Free Express Hair Wash & Blow Dry', 120, 1, 1, 1, 45],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000012', shop2Id, '₹100 Off Any Hair Styling', 40, null, 0, 1],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000013', shop2Id, 'Free Beard Trim with Haircut', 30, null, 0, 1],
+      );
+      await pool.query(
+        'INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['01a10000-0000-0000-0000-000000000014', shop2Id, 'Thank you for visiting!', 30, null, 1, 1],
+      );
+
+      console.log('✅ Demo merchants seeded successfully: "Metro Cafe & Bakery" & "Urban Cuts & Spa"');
+    }
+  } catch (err) {
+    console.error('⚠️ Note on seeding demo shops:', err);
   }
 }
 

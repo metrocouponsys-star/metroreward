@@ -870,6 +870,7 @@ init_env();
 init_schema();
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
+import { randomBytes } from "node:crypto";
 var _pool = null;
 var _tablesEnsured = false;
 var TABLE_DEFINITIONS = [
@@ -1028,9 +1029,68 @@ async function ensureTables(pool) {
       await pool.query(sql8);
     }
     console.log("\u2705 MySQL schema verified: All 13 tables ready.");
+    await ensureSeed(pool);
   } catch (err) {
     console.error("\u26A0\uFE0F Failed to ensure MySQL tables:", err);
     _tablesEnsured = false;
+  }
+}
+async function ensureSeed(pool) {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) as cnt FROM `shops`");
+    const count6 = rows?.[0]?.cnt ?? 0;
+    if (count6 === 0) {
+      console.log("\u{1F331} Seeding initial demo merchants for multi-merchant management...");
+      const secret1 = randomBytes(32);
+      const secret2 = randomBytes(32);
+      const shop1Id = "01a10000-0000-0000-0000-000000000001";
+      const prog1Id = "01a10000-0000-0000-0000-000000000002";
+      await pool.query(
+        "INSERT INTO `shops` (`id`, `slug`, `name`, `owner_phone`, `lat`, `lng`, `qr_secret`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [shop1Id, "metro-cafe", "Metro Cafe & Bakery", "+919029999614", 19.076, 72.8777, secret1, 1]
+      );
+      await pool.query(
+        "INSERT INTO `programs` (`id`, `shop_id`, `stamps_required`, `reward_text`, `cooldown_minutes`, `max_stamps_per_day`, `scratch_enabled`, `scratch_every_n_visits`, `prize_expiry_days`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [prog1Id, shop1Id, 6, "Free Artisanal Beverage or Croissant", 60, 2, 1, 1, 30]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000003", shop1Id, "15% Off Total Bill", 50, null, 0, 1]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000004", shop1Id, "Free Cookie on \u20B9200+ Order", 30, 50, 0, 1]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000005", shop1Id, "Better luck next visit!", 20, null, 1, 1]
+      );
+      const shop2Id = "01a10000-0000-0000-0000-000000000010";
+      const prog2Id = "01a10000-0000-0000-0000-000000000011";
+      await pool.query(
+        "INSERT INTO `shops` (`id`, `slug`, `name`, `owner_phone`, `lat`, `lng`, `qr_secret`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [shop2Id, "urban-salon", "Urban Cuts & Spa", "+919820099999", 19.1136, 72.8697, secret2, 1]
+      );
+      await pool.query(
+        "INSERT INTO `programs` (`id`, `shop_id`, `stamps_required`, `reward_text`, `cooldown_minutes`, `max_stamps_per_day`, `scratch_enabled`, `scratch_every_n_visits`, `prize_expiry_days`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [prog2Id, shop2Id, 5, "Free Express Hair Wash & Blow Dry", 120, 1, 1, 1, 45]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000012", shop2Id, "\u20B9100 Off Any Hair Styling", 40, null, 0, 1]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000013", shop2Id, "Free Beard Trim with Haircut", 30, null, 0, 1]
+      );
+      await pool.query(
+        "INSERT INTO `scratch_prizes` (`id`, `shop_id`, `title`, `weight`, `stock`, `is_no_prize`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ["01a10000-0000-0000-0000-000000000014", shop2Id, "Thank you for visiting!", 30, null, 1, 1]
+      );
+      console.log('\u2705 Demo merchants seeded successfully: "Metro Cafe & Bakery" & "Urban Cuts & Spa"');
+    }
+  } catch (err) {
+    console.error("\u26A0\uFE0F Note on seeding demo shops:", err);
   }
 }
 function getPool() {
@@ -1689,13 +1749,36 @@ async function shopRoutes(app) {
     const session = getSession(req);
     if (!requireRole(session, "shop", reply))
       return null;
-    const shopId = session.shopId;
+    let shopId = session.shopId;
+    if (session.role === "admin") {
+      const reqAny = req;
+      const headerShopId = reqAny.headers?.["x-shop-id"]?.trim();
+      const queryShopId = reqAny.query?.shopId?.trim();
+      const candidateId = headerShopId || queryShopId || shopId;
+      if (candidateId) {
+        const [shop2] = await db.select().from(shops).where(eq7(shops.id, candidateId)).limit(1);
+        if (shop2)
+          return shop2;
+      }
+      const [firstActive] = await db.select().from(shops).where(eq7(shops.isActive, true)).limit(1);
+      if (firstActive)
+        return firstActive;
+      const [anyShop] = await db.select().from(shops).limit(1);
+      if (anyShop)
+        return anyShop;
+      reply.code(404).send({ error: { code: "NO_SHOPS_EXIST", message: "No shops created yet. Onboard a merchant from the Super Admin portal." } });
+      return null;
+    }
     if (!shopId) {
       reply.code(403).send({ error: { code: "FORBIDDEN", message: "No shop linked to this account." } });
       return null;
     }
     const [shop] = await db.select().from(shops).where(eq7(shops.id, shopId)).limit(1);
-    return shop ?? null;
+    if (!shop) {
+      reply.code(404).send({ error: { code: "SHOP_NOT_FOUND", message: "Shop not found." } });
+      return null;
+    }
+    return shop;
   }
   app.get("/shop/qr-token", async (req, reply) => {
     const shop = await getShopForSession(req, reply);
@@ -1778,6 +1861,9 @@ async function shopRoutes(app) {
     const [redeemed] = await db.select({ c: count3() }).from(rewards).where(and6(eq7(rewards.shopId, shop.id), eq7(rewards.status, "redeemed"), gte3(rewards.redeemedAt, todayStart)));
     const [scratchWins] = await db.select({ c: count3() }).from(scratchCards).leftJoin(scratchPrizes, eq7(scratchCards.prizeId, scratchPrizes.id)).where(and6(eq7(scratchCards.shopId, shop.id), gte3(scratchCards.createdAt, todayStart), eq7(scratchPrizes.isNoPrize, false)));
     return reply.send({
+      shopId: shop.id,
+      shopName: shop.name,
+      shopSlug: shop.slug,
       stampsToday: stampsToday?.c ?? 0,
       redeemedToday: redeemed?.c ?? 0,
       scratchWinsToday: scratchWins?.c ?? 0
@@ -1959,7 +2045,7 @@ async function shopRoutes(app) {
 }
 
 // src/routes/admin.ts
-import { eq as eq8, desc as desc3, sql as sql5 } from "drizzle-orm";
+import { and as and7, eq as eq8, desc as desc3, sql as sql5, count as count4, gte as gte4 } from "drizzle-orm";
 import { z as z5 } from "zod";
 init_schema();
 init_crypto();
@@ -2017,12 +2103,100 @@ async function adminRoutes(app) {
     });
     return reply.code(201).send({ ok: true, shopId });
   });
+  app.get("/admin/stats", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const todayStart = /* @__PURE__ */ new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const [totalShopsRow] = await db.select({ c: count4() }).from(shops);
+    const [activeShopsRow] = await db.select({ c: count4() }).from(shops).where(eq8(shops.isActive, true));
+    const [totalCustomersRow] = await db.select({ c: count4() }).from(customers2);
+    const [stampsTodayRow] = await db.select({ c: count4() }).from(stampEvents).where(and7(gte4(stampEvents.createdAt, todayStart), eq8(stampEvents.status, "counted")));
+    const [redeemedTodayRow] = await db.select({ c: count4() }).from(rewards).where(and7(gte4(rewards.redeemedAt, todayStart), eq8(rewards.status, "redeemed")));
+    return reply.send({
+      totalShops: totalShopsRow?.c ?? 0,
+      activeShops: activeShopsRow?.c ?? 0,
+      totalCustomers: totalCustomersRow?.c ?? 0,
+      stampsToday: stampsTodayRow?.c ?? 0,
+      redeemedToday: redeemedTodayRow?.c ?? 0
+    });
+  });
   app.get("/admin/shops", async (req, reply) => {
     const session = getSession(req);
     if (!requireRole(session, "admin", reply))
       return;
     const allShops = await db.select().from(shops).orderBy(desc3(shops.createdAt));
-    return reply.send({ shops: allShops });
+    const enriched = await Promise.all(
+      allShops.map(async (s) => {
+        const [prog] = await db.select().from(programs).where(eq8(programs.shopId, s.id)).limit(1);
+        const [memberCountRow] = await db.select({ c: sql5`COUNT(DISTINCT ${stampEvents.customerId})` }).from(stampEvents).where(and7(eq8(stampEvents.shopId, s.id), eq8(stampEvents.status, "counted")));
+        const [stampsCountRow] = await db.select({ c: count4() }).from(stampEvents).where(and7(eq8(stampEvents.shopId, s.id), eq8(stampEvents.status, "counted")));
+        return {
+          id: s.id,
+          slug: s.slug,
+          name: s.name,
+          ownerPhone: s.ownerPhone,
+          lat: s.lat,
+          lng: s.lng,
+          isActive: s.isActive,
+          createdAt: s.createdAt,
+          memberCount: Number(memberCountRow?.c ?? 0),
+          totalStamps: Number(stampsCountRow?.c ?? 0),
+          program: prog ? {
+            stampsRequired: prog.stampsRequired,
+            rewardText: prog.rewardText,
+            scratchEnabled: prog.scratchEnabled
+          } : null
+        };
+      })
+    );
+    return reply.send({ shops: enriched });
+  });
+  app.post("/admin/impersonate/:shopId", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const { shopId } = req.params;
+    const [shop] = await db.select().from(shops).where(eq8(shops.id, shopId)).limit(1);
+    if (!shop) {
+      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "Shop not found." } });
+    }
+    setSessionCookie(reply, {
+      ...session,
+      shopId: shop.id
+    });
+    await writeAudit(db, {
+      actorType: "admin",
+      actorId: session.customerId,
+      action: "shop_impersonate",
+      detail: { shopId: shop.id, shopName: shop.name, shopSlug: shop.slug }
+    });
+    return reply.send({ ok: true, shop: { id: shop.id, name: shop.name, slug: shop.slug } });
+  });
+  app.post("/admin/exit-impersonate", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    setSessionCookie(reply, {
+      ...session,
+      shopId: void 0
+    });
+    return reply.send({ ok: true });
+  });
+  app.post("/admin/shops/:id/activate", async (req, reply) => {
+    const session = getSession(req);
+    if (!requireRole(session, "admin", reply))
+      return;
+    const { id } = req.params;
+    await db.update(shops).set({ isActive: true }).where(eq8(shops.id, id));
+    await writeAudit(db, {
+      actorType: "admin",
+      actorId: session.customerId,
+      action: "shop_activate",
+      detail: { shopId: id }
+    });
+    return reply.send({ ok: true });
   });
   app.post("/admin/shops/:id/deactivate", async (req, reply) => {
     const session = getSession(req);
@@ -2054,7 +2228,7 @@ init_env();
 
 // src/services/reminder.ts
 init_schema();
-import { and as and9, eq as eq10, isNull as isNull4, lte, sql as sql6, count as count4, gte as gte4, desc as desc4 } from "drizzle-orm";
+import { and as and9, eq as eq10, isNull as isNull4, lte, sql as sql6, count as count5, gte as gte5, desc as desc4 } from "drizzle-orm";
 
 // src/services/push.ts
 init_schema();
@@ -2099,22 +2273,22 @@ async function canSendReminder(db, customerId, shopId, now = /* @__PURE__ */ new
   if (muted)
     return false;
   const threeDaysAgo = addDays(now, -CONSTANTS.REMINDER_MIN_INTERVAL_DAYS);
-  const [recentSent] = await db.select({ c: count4() }).from(reminders).where(
+  const [recentSent] = await db.select({ c: count5() }).from(reminders).where(
     and9(
       eq10(reminders.customerId, customerId),
       eq10(reminders.shopId, shopId),
-      gte4(reminders.sentAt, threeDaysAgo)
+      gte5(reminders.sentAt, threeDaysAgo)
     )
   );
   if ((recentSent?.c ?? 0) > 0)
     return false;
   const [lastEvent] = await db.select({ createdAt: stampEvents.createdAt }).from(stampEvents).where(and9(eq10(stampEvents.customerId, customerId), eq10(stampEvents.shopId, shopId))).orderBy(desc4(stampEvents.createdAt)).limit(1);
-  const ignoredQuery = db.select({ c: count4() }).from(reminders).where(
+  const ignoredQuery = db.select({ c: count5() }).from(reminders).where(
     and9(
       eq10(reminders.customerId, customerId),
       eq10(reminders.shopId, shopId),
       sql6`${reminders.sentAt} IS NOT NULL`,
-      lastEvent ? gte4(reminders.sentAt, lastEvent.createdAt) : sql6`1=1`
+      lastEvent ? gte5(reminders.sentAt, lastEvent.createdAt) : sql6`1=1`
     )
   );
   const [ignored] = await ignoredQuery;
@@ -2138,7 +2312,7 @@ async function processReminders(db, now = /* @__PURE__ */ new Date()) {
           eq10(reminders.customerId, reward.customerId),
           eq10(reminders.shopId, reward.shopId),
           eq10(reminders.kind, "reward_ready"),
-          gte4(reminders.sendAfter, reward.createdAt)
+          gte5(reminders.sendAfter, reward.createdAt)
         )
       ).limit(1);
       if (!existing) {
@@ -2159,7 +2333,7 @@ async function processReminders(db, now = /* @__PURE__ */ new Date()) {
       eq10(rewards.source, "scratch"),
       sql6`${rewards.expiresAt} IS NOT NULL`,
       lte(rewards.expiresAt, inThreeDays),
-      gte4(rewards.expiresAt, now)
+      gte5(rewards.expiresAt, now)
     )
   );
   for (const exp of expiringRewards) {

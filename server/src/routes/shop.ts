@@ -35,13 +35,43 @@ export async function shopRoutes(app: FastifyInstance) {
   async function getShopForSession(req: Parameters<typeof getSession>[0], reply: Parameters<typeof requireRole>[2]) {
     const session = getSession(req);
     if (!requireRole(session, 'shop', reply)) return null;
-    const shopId = session!.shopId;
+
+    let shopId = session!.shopId;
+
+    // Super Admin can inspect/manage any shop: check header, query, session, or default to first active shop
+    if (session!.role === 'admin') {
+      const reqAny = req as any;
+      const headerShopId = (reqAny.headers?.['x-shop-id'] as string | undefined)?.trim();
+      const queryShopId = (reqAny.query?.shopId as string | undefined)?.trim();
+      const candidateId = headerShopId || queryShopId || shopId;
+
+      if (candidateId) {
+        const [shop] = await db.select().from(shops).where(eq(shops.id, candidateId)).limit(1);
+        if (shop) return shop;
+      }
+
+      // Default to first active shop
+      const [firstActive] = await db.select().from(shops).where(eq(shops.isActive, true)).limit(1);
+      if (firstActive) return firstActive;
+
+      // Fallback to any shop
+      const [anyShop] = await db.select().from(shops).limit(1);
+      if (anyShop) return anyShop;
+
+      reply.code(404).send({ error: { code: 'NO_SHOPS_EXIST', message: 'No shops created yet. Onboard a merchant from the Super Admin portal.' } });
+      return null;
+    }
+
     if (!shopId) {
       reply.code(403).send({ error: { code: 'FORBIDDEN', message: 'No shop linked to this account.' } });
       return null;
     }
     const [shop] = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
-    return shop ?? null;
+    if (!shop) {
+      reply.code(404).send({ error: { code: 'SHOP_NOT_FOUND', message: 'Shop not found.' } });
+      return null;
+    }
+    return shop;
   }
 
   // GET /api/shop/qr-token
@@ -166,6 +196,9 @@ export async function shopRoutes(app: FastifyInstance) {
       .where(and(eq(scratchCards.shopId, shop.id), gte(scratchCards.createdAt, todayStart), eq(scratchPrizes.isNoPrize, false)));
 
     return reply.send({
+      shopId: shop.id,
+      shopName: shop.name,
+      shopSlug: shop.slug,
       stampsToday: stampsToday?.c ?? 0,
       redeemedToday: redeemed?.c ?? 0,
       scratchWinsToday: scratchWins?.c ?? 0,
