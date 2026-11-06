@@ -8,34 +8,40 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// server/src/lib/env.ts
+// src/lib/env.ts
 import { z } from "zod";
 function parseEnv() {
   const result = schema.safeParse(process.env);
   if (!result.success) {
     console.error("\u274C  Invalid environment variables:");
     console.error(result.error.flatten().fieldErrors);
-    process.exit(1);
   }
-  return result.data;
+  return result.success ? result.data : schema.parse({});
 }
-var schema, env, adminPhones;
+function resolvePort() {
+  const p = env.PORT;
+  const n = parseInt(p, 10);
+  return isNaN(n) ? p : n;
+}
+var schema, env, dbReady, adminPhones;
 var init_env = __esm({
-  "server/src/lib/env.ts"() {
+  "src/lib/env.ts"() {
     "use strict";
     schema = z.object({
-      DATABASE_URL: z.string().min(1),
-      SESSION_SECRET: z.string().min(32),
+      // Optional at startup — DB routes will return 503 if not set
+      DATABASE_URL: z.string().min(1).optional().default(""),
+      SESSION_SECRET: z.string().min(32).optional().default("dev-session-secret-change-me-in-prod-32ch"),
       OTP_PROVIDER_URL: z.string().url().optional(),
       OTP_PROVIDER_KEY: z.string().optional(),
       OTP_SENDER_ID: z.string().optional(),
       VAPID_PUBLIC_KEY: z.string().optional().default(""),
       VAPID_PRIVATE_KEY: z.string().optional().default(""),
-      BASE_URL: z.string().url().default("http://localhost:3000"),
+      BASE_URL: z.string().optional().default("http://localhost:3000"),
       ADMIN_PHONES: z.string().default(""),
-      CRON_SECRET: z.string().min(16).default("dev-cron-secret"),
+      CRON_SECRET: z.string().optional().default("dev-cron-secret"),
       NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-      PORT: z.coerce.number().default(3e3),
+      // Accept string so Hostinger's socket path (e.g. /tmp/sock) doesn't break coerce
+      PORT: z.string().optional().default("3000"),
       SITE_ORIGIN: z.string().optional().default(""),
       SMTP_HOST: z.string().optional().default(""),
       SMTP_USER: z.string().optional().default(""),
@@ -43,11 +49,16 @@ var init_env = __esm({
       CONTACT_TO: z.string().optional().default("")
     });
     env = parseEnv();
+    dbReady = env.DATABASE_URL.length > 10;
+    if (!dbReady) {
+      console.warn("\u26A0\uFE0F  DATABASE_URL is not set. DB-dependent routes will return 503.");
+      console.warn("   Set DATABASE_URL in Hostinger \u2192 Web App \u2192 Environment Variables");
+    }
     adminPhones = env.ADMIN_PHONES.split(",").map((p) => p.trim()).filter(Boolean);
   }
 });
 
-// server/src/db/schema.ts
+// src/db/schema.ts
 var schema_exports = {};
 __export(schema_exports, {
   auditLog: () => auditLog,
@@ -83,7 +94,7 @@ import {
 } from "drizzle-orm/mysql-core";
 var shops, customers2, programs, stampEvents, rewards, scratchPrizes, scratchCards, otpRequests, pushSubscriptions, reminders, reminderMutes, contactRequests, auditLog;
 var init_schema = __esm({
-  "server/src/db/schema.ts"() {
+  "src/db/schema.ts"() {
     "use strict";
     shops = mysqlTable(
       "shops",
@@ -255,7 +266,7 @@ var init_schema = __esm({
   }
 });
 
-// server/src/lib/crypto.ts
+// src/lib/crypto.ts
 var crypto_exports = {};
 __export(crypto_exports, {
   b64url: () => b64url,
@@ -313,13 +324,13 @@ function generateRewardCode() {
 }
 var CODE_ALPHABET;
 var init_crypto = __esm({
-  "server/src/lib/crypto.ts"() {
+  "src/lib/crypto.ts"() {
     "use strict";
     CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
   }
 });
 
-// server/src/lib/utils.ts
+// src/lib/utils.ts
 var utils_exports = {};
 __export(utils_exports, {
   addDays: () => addDays,
@@ -368,19 +379,19 @@ function normalizePhone(phone) {
   return phone;
 }
 var init_utils = __esm({
-  "server/src/lib/utils.ts"() {
+  "src/lib/utils.ts"() {
     "use strict";
   }
 });
 
-// server/src/lib/constants.ts
+// src/lib/constants.ts
 var constants_exports = {};
 __export(constants_exports, {
   CONSTANTS: () => CONSTANTS
 });
 var CONSTANTS;
 var init_constants = __esm({
-  "server/src/lib/constants.ts"() {
+  "src/lib/constants.ts"() {
     "use strict";
     CONSTANTS = {
       // Token
@@ -418,7 +429,7 @@ var init_constants = __esm({
   }
 });
 
-// server/src/services/audit.ts
+// src/services/audit.ts
 var audit_exports = {};
 __export(audit_exports, {
   writeAudit: () => writeAudit
@@ -437,13 +448,13 @@ async function writeAudit(db, entry) {
   }
 }
 var init_audit = __esm({
-  "server/src/services/audit.ts"() {
+  "src/services/audit.ts"() {
     "use strict";
     init_schema();
   }
 });
 
-// server/src/services/token.ts
+// src/services/token.ts
 var token_exports = {};
 __export(token_exports, {
   issueCustomerToken: () => issueCustomerToken,
@@ -516,7 +527,7 @@ function verifyCustomerToken(token) {
   return { ok: true, payload };
 }
 var init_token = __esm({
-  "server/src/services/token.ts"() {
+  "src/services/token.ts"() {
     "use strict";
     init_crypto();
     init_constants();
@@ -524,7 +535,7 @@ var init_token = __esm({
   }
 });
 
-// server/src/services/scratch.ts
+// src/services/scratch.ts
 import { and as and2, eq as eq3, sql as sql2 } from "drizzle-orm";
 async function selectPrize(db, shopId) {
   const prizes = await db.select().from(scratchPrizes).where(and2(eq3(scratchPrizes.shopId, shopId), eq3(scratchPrizes.isActive, true)));
@@ -566,14 +577,14 @@ async function selectPrize(db, shopId) {
   return null;
 }
 var init_scratch = __esm({
-  "server/src/services/scratch.ts"() {
+  "src/services/scratch.ts"() {
     "use strict";
     init_schema();
     init_crypto();
   }
 });
 
-// server/src/services/stamp.ts
+// src/services/stamp.ts
 var stamp_exports = {};
 __export(stamp_exports, {
   getStampBalance: () => getStampBalance,
@@ -758,7 +769,7 @@ async function getCountedStampCount(db, shopId, customerId) {
   return row?.c ?? 0;
 }
 var init_stamp = __esm({
-  "server/src/services/stamp.ts"() {
+  "src/services/stamp.ts"() {
     "use strict";
     init_schema();
     init_crypto();
@@ -769,7 +780,7 @@ var init_stamp = __esm({
   }
 });
 
-// server/src/services/contact-email.ts
+// src/services/contact-email.ts
 var contact_email_exports = {};
 __export(contact_email_exports, {
   sendContactNotification: () => sendContactNotification
@@ -813,12 +824,12 @@ async function sendContactNotification(data) {
   });
 }
 var init_contact_email = __esm({
-  "server/src/services/contact-email.ts"() {
+  "src/services/contact-email.ts"() {
     "use strict";
   }
 });
 
-// server/src/index.ts
+// src/index.ts
 init_env();
 import "dotenv/config";
 import Fastify from "fastify";
@@ -830,17 +841,20 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 
-// server/src/routes/auth.ts
+// src/routes/auth.ts
 import { z as z2 } from "zod";
 import { eq as eq2 } from "drizzle-orm";
 
-// server/src/db/client.ts
+// src/db/client.ts
 init_env();
 init_schema();
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 var _pool = null;
 function getPool() {
+  if (!dbReady) {
+    throw new Error("DATABASE_URL is not configured. Set it in Hostinger \u2192 Web App \u2192 Environment Variables.");
+  }
   if (!_pool) {
     _pool = mysql.createPool({
       uri: env.DATABASE_URL,
@@ -856,17 +870,17 @@ function getDb() {
   return drizzle(getPool(), { schema: schema_exports, mode: "default" });
 }
 
-// server/src/routes/auth.ts
+// src/routes/auth.ts
 init_schema();
 
-// server/src/services/otp.ts
+// src/services/otp.ts
 init_schema();
 init_crypto();
 init_utils();
 init_constants();
 import { and, eq, gte, isNull, sql, count } from "drizzle-orm";
 
-// server/src/services/otpSender.ts
+// src/services/otpSender.ts
 init_env();
 var ConsoleSender = class {
   async send(phone, code) {
@@ -895,7 +909,7 @@ var HttpSender = class {
 };
 var otpSender = env.NODE_ENV === "production" ? new HttpSender() : new ConsoleSender();
 
-// server/src/services/otp.ts
+// src/services/otp.ts
 async function requestOtp(db, phone, ip) {
   const now = /* @__PURE__ */ new Date();
   const hourAgo = new Date(now.getTime() - 36e5);
@@ -975,7 +989,7 @@ async function verifyOtp(db, phone, code, ip) {
   return { ok: true };
 }
 
-// server/src/plugins/session.ts
+// src/plugins/session.ts
 init_env();
 init_constants();
 import { createHmac } from "node:crypto";
@@ -1041,7 +1055,7 @@ function requireRole(session, role, reply) {
   return true;
 }
 
-// server/src/routes/auth.ts
+// src/routes/auth.ts
 init_crypto();
 init_utils();
 init_env();
@@ -1160,7 +1174,7 @@ async function authRoutes(app2) {
   });
 }
 
-// server/src/routes/scan.ts
+// src/routes/scan.ts
 import { z as z3 } from "zod";
 import { eq as eq5 } from "drizzle-orm";
 init_schema();
@@ -1244,7 +1258,7 @@ async function scanRoutes(app2) {
   );
 }
 
-// server/src/routes/customer.ts
+// src/routes/customer.ts
 import { and as and5, eq as eq6, desc } from "drizzle-orm";
 init_schema();
 init_stamp();
@@ -1451,7 +1465,7 @@ async function customerRoutes(app2) {
   });
 }
 
-// server/src/routes/shop.ts
+// src/routes/shop.ts
 import { and as and6, eq as eq7, desc as desc2, gte as gte3, sql as sql4, count as count3 } from "drizzle-orm";
 init_schema();
 init_token();
@@ -1750,7 +1764,7 @@ async function shopRoutes(app2) {
   });
 }
 
-// server/src/routes/admin.ts
+// src/routes/admin.ts
 import { eq as eq8, desc as desc3, sql as sql5 } from "drizzle-orm";
 import { z as z5 } from "zod";
 init_schema();
@@ -1841,14 +1855,14 @@ async function adminRoutes(app2) {
   });
 }
 
-// server/src/routes/cron.ts
+// src/routes/cron.ts
 init_env();
 
-// server/src/services/reminder.ts
+// src/services/reminder.ts
 init_schema();
 import { and as and9, eq as eq10, isNull as isNull4, lte, sql as sql6, count as count4, gte as gte4, desc as desc4 } from "drizzle-orm";
 
-// server/src/services/push.ts
+// src/services/push.ts
 init_schema();
 init_env();
 import webpush from "web-push";
@@ -1879,7 +1893,7 @@ async function sendPushToCustomer(db, customerId, payload) {
   }
 }
 
-// server/src/services/reminder.ts
+// src/services/reminder.ts
 init_utils();
 init_constants();
 init_crypto();
@@ -2009,7 +2023,7 @@ async function processReminders(db, now = /* @__PURE__ */ new Date()) {
   return { sent };
 }
 
-// server/src/routes/contact.ts
+// src/routes/contact.ts
 init_schema();
 import { z as z6 } from "zod";
 import { randomUUID, createHash } from "node:crypto";
@@ -2119,7 +2133,7 @@ async function cleanupOldContactRequests() {
   return result[0]?.affectedRows ?? 0;
 }
 
-// server/src/routes/cron.ts
+// src/routes/cron.ts
 async function cronRoutes(app2) {
   const db = getDb();
   app2.post("/internal/cron/reminders", async (req, reply) => {
@@ -2133,7 +2147,7 @@ async function cronRoutes(app2) {
   });
 }
 
-// server/src/index.ts
+// src/index.ts
 var __dirname = dirname(fileURLToPath(import.meta.url));
 var app = Fastify({
   logger: { level: env.NODE_ENV === "production" ? "info" : "debug" },
@@ -2177,7 +2191,12 @@ await app.register(
   },
   { prefix: "/api" }
 );
-app.get("/health", async () => ({ ok: true, status: "healthy", ts: (/* @__PURE__ */ new Date()).toISOString() }));
+app.get("/health", async () => ({
+  ok: true,
+  status: "healthy",
+  db: dbReady ? "configured" : "missing-DATABASE_URL",
+  ts: (/* @__PURE__ */ new Date()).toISOString()
+}));
 var webDist = existsSync(join(process.cwd(), "web/dist")) ? join(process.cwd(), "web/dist") : join(__dirname, "../../web/dist");
 if (existsSync(webDist)) {
   await app.register(fastifyStatic, {
@@ -2195,9 +2214,11 @@ if (existsSync(webDist)) {
     reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
   });
 }
+var portOrSocket = resolvePort();
+console.log(`\u{1F680} Starting Stamp \u2014 PORT env="${env.PORT}" resolved="${portOrSocket}" db=${dbReady ? "ready" : "NOT SET"}`);
 try {
-  await app.listen({ port: env.PORT, host: "0.0.0.0" });
-  console.log(`\u2705  Stamp server listening on port ${env.PORT}`);
+  await app.listen({ port: portOrSocket, host: "0.0.0.0" });
+  console.log(`\u2705  Stamp server listening on ${portOrSocket}`);
 } catch (err) {
   app.log.error(err);
   console.error("\u274C Fastify app.listen failed:", err);

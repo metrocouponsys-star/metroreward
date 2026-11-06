@@ -7,7 +7,7 @@ import fastifyStatic from '@fastify/static';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
-import { env } from './lib/env.ts';
+import { env, dbReady, resolvePort } from './lib/env.ts';
 import { authRoutes } from './routes/auth.ts';
 import { scanRoutes } from './routes/scan.ts';
 import { customerRoutes } from './routes/customer.ts';
@@ -69,7 +69,12 @@ await app.register(
 );
 
 // ── Health probe ─────────────────────────────────────────────────────────────
-app.get('/health', async () => ({ ok: true, status: 'healthy', ts: new Date().toISOString() }));
+app.get('/health', async () => ({
+  ok: true,
+  status: 'healthy',
+  db: dbReady ? 'configured' : 'missing-DATABASE_URL',
+  ts: new Date().toISOString(),
+}));
 
 // ── Serve built web app ───────────────────────────────────────────────────────
 const webDist = existsSync(join(process.cwd(), 'web/dist'))
@@ -96,9 +101,12 @@ if (existsSync(webDist)) {
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
+const portOrSocket = resolvePort();
+console.log(`🚀 Starting Stamp — PORT env="${env.PORT}" resolved="${portOrSocket}" db=${dbReady ? 'ready' : 'NOT SET'}`);
 try {
-  await app.listen({ port: env.PORT, host: '0.0.0.0' });
-  console.log(`✅  Stamp server listening on port ${env.PORT}`);
+  // Fastify accepts both numeric ports and Unix socket paths
+  await app.listen({ port: portOrSocket as number, host: '0.0.0.0' });
+  console.log(`✅  Stamp server listening on ${portOrSocket}`);
 } catch (err) {
   app.log.error(err);
   console.error('❌ Fastify app.listen failed:', err);
