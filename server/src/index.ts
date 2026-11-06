@@ -92,6 +92,7 @@ try {
   console.log(`✅  Stamp server listening on port ${env.PORT}`);
 } catch (err) {
   app.log.error(err);
+  console.error('❌ Fastify app.listen failed:', err);
   process.exit(1);
 }
 
