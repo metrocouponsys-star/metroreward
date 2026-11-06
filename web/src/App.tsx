@@ -74,10 +74,13 @@ function AppRoutes() {
           </>
         )}
 
-        {/* Shop routes */}
-        {(user?.role === 'shop' || user?.role === 'admin') && (
+        {/* Admin routes */}
+        {user?.role === 'admin' && (
           <>
-            <Route path="/" element={<Navigate to="/shop" replace />} />
+            <Route path="/" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin" element={<AdminShopsPage />} />
+            <Route path="/admin/create-shop" element={<AdminCreateShopPage />} />
+            <Route path="/admin/flags" element={<AdminFlagsPage />} />
             <Route path="/shop" element={<ShopDashboardPage />} />
             <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
             <Route path="/shop/print-qr" element={<PrintQrPage />} />
@@ -89,12 +92,18 @@ function AppRoutes() {
           </>
         )}
 
-        {/* Admin routes */}
-        {user?.role === 'admin' && (
+        {/* Shop routes */}
+        {user?.role === 'shop' && (
           <>
-            <Route path="/admin" element={<AdminShopsPage />} />
-            <Route path="/admin/create-shop" element={<AdminCreateShopPage />} />
-            <Route path="/admin/flags" element={<AdminFlagsPage />} />
+            <Route path="/" element={<Navigate to="/shop" replace />} />
+            <Route path="/shop" element={<ShopDashboardPage />} />
+            <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
+            <Route path="/shop/print-qr" element={<PrintQrPage />} />
+            <Route path="/shop/qr" element={<ShopQrPage />} />
+            <Route path="/shop/feed" element={<ShopFeedPage />} />
+            <Route path="/shop/redeem" element={<ShopRedeemPage />} />
+            <Route path="/shop/customers" element={<ShopCustomersPage />} />
+            <Route path="/shop/program" element={<ShopProgramPage />} />
           </>
         )}
 
