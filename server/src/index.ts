@@ -86,15 +86,28 @@ export async function start() {
     ? join(process.cwd(), 'web/dist')
     : join(__dirname, '../../web/dist');
 
-  // Register static asset handlers
+  // Register static assets for marketing site (handles / -> index.html, /_assets/*, favicon.svg, robots.txt)
   if (existsSync(siteDist)) {
     await app.register(fastifyStatic, {
       root: siteDist,
       prefix: '/',
-      wildcard: false,
+      index: ['index.html'],
+      decorateReply: true,
     });
+
+    // Explicit clean routes for marketing pages (handles both /about and /about/)
+    const pages = ['about', 'contact', 'privacy-policy', 'terms-and-conditions', 'refund-policy'];
+    for (const p of pages) {
+      app.get(`/${p}`, async (_req, reply) => {
+        return reply.type('text/html; charset=utf-8').sendFile(`${p}/index.html`, siteDist);
+      });
+      app.get(`/${p}/`, async (_req, reply) => {
+        return reply.type('text/html; charset=utf-8').sendFile(`${p}/index.html`, siteDist);
+      });
+    }
   }
 
+  // Register static assets for React web app (/assets/*)
   if (existsSync(webDist)) {
     await app.register(fastifyStatic, {
       root: webDist,
@@ -103,20 +116,12 @@ export async function start() {
     });
   }
 
-  const marketingRoutes = new Set([
-    '/',
-    '/about',
-    '/about/',
-    '/contact',
-    '/contact/',
-    '/privacy-policy',
-    '/privacy-policy/',
-    '/terms-and-conditions',
-    '/terms-and-conditions/',
-    '/refund-policy',
-    '/refund-policy/',
-  ]);
+  // Redirect /login to /sign-in
+  app.get('/login', async (_req, reply) => {
+    return reply.redirect('/sign-in');
+  });
 
+  // Fallback handler: static files or React SPA
   app.setNotFoundHandler((req, reply) => {
     const rawUrl = (req.raw.url || '/').split('?')[0];
 
@@ -125,38 +130,18 @@ export async function start() {
       return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'API endpoint not found.' } });
     }
 
-    // Direct /login -> redirect to /sign-in
+    // Direct /login
     if (rawUrl === '/login' || rawUrl === '/login/') {
       return reply.redirect('/sign-in');
     }
 
-    // Marketing pages from site/dist
-    if (existsSync(siteDist) && marketingRoutes.has(rawUrl)) {
-      const clean = rawUrl.replace(/\/$/, '') || '/index';
-      const file = join(siteDist, `${clean === '/index' ? 'index' : clean.slice(1)}/index.html`);
-      const directFile = join(siteDist, `${clean === '/index' ? 'index' : clean.slice(1)}.html`);
-      if (existsSync(file)) return reply.type('text/html; charset=utf-8').sendFile(file.slice(siteDist.length + 1), siteDist);
-      if (existsSync(directFile)) return reply.type('text/html; charset=utf-8').sendFile(directFile.slice(siteDist.length + 1), siteDist);
-    }
-
-    // Specific static files from site/dist (e.g. _assets, favicon, robots)
-    if (existsSync(siteDist)) {
-      const siteFile = join(siteDist, rawUrl.slice(1));
-      if (existsSync(siteFile) && !rawUrl.endsWith('/')) {
-        return reply.sendFile(rawUrl.slice(1), siteDist);
-      }
-    }
-
-    // Specific static files from web/dist (e.g. sw.js, manifest.webmanifest, registerSW.js)
+    // Check if it's a static file in webDist (e.g. sw.js, manifest.webmanifest, registerSW.js)
     if (existsSync(webDist)) {
       const webFile = join(webDist, rawUrl.slice(1));
       if (existsSync(webFile) && !rawUrl.endsWith('/')) {
         return reply.sendFile(rawUrl.slice(1), webDist);
       }
-    }
-
-    // SPA fallback: Product app (Sign In / Shop Dashboard / Customer Card)
-    if (existsSync(webDist)) {
+      // SPA fallback for all app routes (/sign-in, /shop, /customer, /admin, /s/*)
       return reply.type('text/html; charset=utf-8').sendFile('index.html', webDist);
     }
 

@@ -2222,8 +2222,18 @@ async function start() {
     await app.register(fastifyStatic, {
       root: siteDist,
       prefix: "/",
-      wildcard: false
+      index: ["index.html"],
+      decorateReply: true
     });
+    const pages = ["about", "contact", "privacy-policy", "terms-and-conditions", "refund-policy"];
+    for (const p of pages) {
+      app.get(`/${p}`, async (_req, reply) => {
+        return reply.type("text/html; charset=utf-8").sendFile(`${p}/index.html`, siteDist);
+      });
+      app.get(`/${p}/`, async (_req, reply) => {
+        return reply.type("text/html; charset=utf-8").sendFile(`${p}/index.html`, siteDist);
+      });
+    }
   }
   if (existsSync(webDist)) {
     await app.register(fastifyStatic, {
@@ -2232,19 +2242,9 @@ async function start() {
       decorateReply: false
     });
   }
-  const marketingRoutes = /* @__PURE__ */ new Set([
-    "/",
-    "/about",
-    "/about/",
-    "/contact",
-    "/contact/",
-    "/privacy-policy",
-    "/privacy-policy/",
-    "/terms-and-conditions",
-    "/terms-and-conditions/",
-    "/refund-policy",
-    "/refund-policy/"
-  ]);
+  app.get("/login", async (_req, reply) => {
+    return reply.redirect("/sign-in");
+  });
   app.setNotFoundHandler((req, reply) => {
     const rawUrl = (req.raw.url || "/").split("?")[0];
     if (rawUrl.startsWith("/api")) {
@@ -2253,28 +2253,11 @@ async function start() {
     if (rawUrl === "/login" || rawUrl === "/login/") {
       return reply.redirect("/sign-in");
     }
-    if (existsSync(siteDist) && marketingRoutes.has(rawUrl)) {
-      const clean = rawUrl.replace(/\/$/, "") || "/index";
-      const file = join(siteDist, `${clean === "/index" ? "index" : clean.slice(1)}/index.html`);
-      const directFile = join(siteDist, `${clean === "/index" ? "index" : clean.slice(1)}.html`);
-      if (existsSync(file))
-        return reply.type("text/html; charset=utf-8").sendFile(file.slice(siteDist.length + 1), siteDist);
-      if (existsSync(directFile))
-        return reply.type("text/html; charset=utf-8").sendFile(directFile.slice(siteDist.length + 1), siteDist);
-    }
-    if (existsSync(siteDist)) {
-      const siteFile = join(siteDist, rawUrl.slice(1));
-      if (existsSync(siteFile) && !rawUrl.endsWith("/")) {
-        return reply.sendFile(rawUrl.slice(1), siteDist);
-      }
-    }
     if (existsSync(webDist)) {
       const webFile = join(webDist, rawUrl.slice(1));
       if (existsSync(webFile) && !rawUrl.endsWith("/")) {
         return reply.sendFile(rawUrl.slice(1), webDist);
       }
-    }
-    if (existsSync(webDist)) {
       return reply.type("text/html; charset=utf-8").sendFile("index.html", webDist);
     }
     reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
