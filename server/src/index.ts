@@ -77,29 +77,91 @@ export async function start() {
     ts: new Date().toISOString(),
   }));
 
-  // ── Serve built web app ───────────────────────────────────────────────────────
+  // ── Serve Marketing Site (site/dist) & Product Web App (web/dist) ───────────
+  const siteDist = existsSync(join(process.cwd(), 'site/dist'))
+    ? join(process.cwd(), 'site/dist')
+    : join(__dirname, '../../site/dist');
+
   const webDist = existsSync(join(process.cwd(), 'web/dist'))
     ? join(process.cwd(), 'web/dist')
     : join(__dirname, '../../web/dist');
 
+  // Register static asset handlers
+  if (existsSync(siteDist)) {
+    await app.register(fastifyStatic, {
+      root: siteDist,
+      prefix: '/',
+      wildcard: false,
+    });
+  }
+
   if (existsSync(webDist)) {
     await app.register(fastifyStatic, {
       root: webDist,
-      wildcard: false,
-    });
-
-    // SPA fallback (send index.html for non-API routes)
-    app.setNotFoundHandler((req, reply) => {
-      if (req.raw.url?.startsWith('/api')) {
-        return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'API endpoint not found.' } });
-      }
-      reply.sendFile('index.html', webDist);
-    });
-  } else {
-    app.setNotFoundHandler((_req, reply) => {
-      reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Not found.' } });
+      prefix: '/assets/',
+      decorateReply: false,
     });
   }
+
+  const marketingRoutes = new Set([
+    '/',
+    '/about',
+    '/about/',
+    '/contact',
+    '/contact/',
+    '/privacy-policy',
+    '/privacy-policy/',
+    '/terms-and-conditions',
+    '/terms-and-conditions/',
+    '/refund-policy',
+    '/refund-policy/',
+  ]);
+
+  app.setNotFoundHandler((req, reply) => {
+    const rawUrl = (req.raw.url || '/').split('?')[0];
+
+    // API 404
+    if (rawUrl.startsWith('/api')) {
+      return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'API endpoint not found.' } });
+    }
+
+    // Direct /login -> redirect to /sign-in
+    if (rawUrl === '/login' || rawUrl === '/login/') {
+      return reply.redirect('/sign-in');
+    }
+
+    // Marketing pages from site/dist
+    if (existsSync(siteDist) && marketingRoutes.has(rawUrl)) {
+      const clean = rawUrl.replace(/\/$/, '') || '/index';
+      const file = join(siteDist, `${clean === '/index' ? 'index' : clean.slice(1)}/index.html`);
+      const directFile = join(siteDist, `${clean === '/index' ? 'index' : clean.slice(1)}.html`);
+      if (existsSync(file)) return reply.type('text/html; charset=utf-8').sendFile(file.slice(siteDist.length + 1), siteDist);
+      if (existsSync(directFile)) return reply.type('text/html; charset=utf-8').sendFile(directFile.slice(siteDist.length + 1), siteDist);
+    }
+
+    // Specific static files from site/dist (e.g. _assets, favicon, robots)
+    if (existsSync(siteDist)) {
+      const siteFile = join(siteDist, rawUrl.slice(1));
+      if (existsSync(siteFile) && !rawUrl.endsWith('/')) {
+        return reply.sendFile(rawUrl.slice(1), siteDist);
+      }
+    }
+
+    // Specific static files from web/dist (e.g. sw.js, manifest.webmanifest, registerSW.js)
+    if (existsSync(webDist)) {
+      const webFile = join(webDist, rawUrl.slice(1));
+      if (existsSync(webFile) && !rawUrl.endsWith('/')) {
+        return reply.sendFile(rawUrl.slice(1), webDist);
+      }
+    }
+
+    // SPA fallback: Product app (Sign In / Shop Dashboard / Customer Card)
+    if (existsSync(webDist)) {
+      return reply.type('text/html; charset=utf-8').sendFile('index.html', webDist);
+    }
+
+    reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Not found.' } });
+  });
 
   // ── Start ─────────────────────────────────────────────────────────────────────
   const portOrSocket = resolvePort();

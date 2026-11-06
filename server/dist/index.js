@@ -2216,23 +2216,69 @@ async function start() {
     db: dbReady ? "configured" : "missing-DATABASE_URL",
     ts: (/* @__PURE__ */ new Date()).toISOString()
   }));
+  const siteDist = existsSync(join(process.cwd(), "site/dist")) ? join(process.cwd(), "site/dist") : join(__dirname, "../../site/dist");
   const webDist = existsSync(join(process.cwd(), "web/dist")) ? join(process.cwd(), "web/dist") : join(__dirname, "../../web/dist");
+  if (existsSync(siteDist)) {
+    await app.register(fastifyStatic, {
+      root: siteDist,
+      prefix: "/",
+      wildcard: false
+    });
+  }
   if (existsSync(webDist)) {
     await app.register(fastifyStatic, {
       root: webDist,
-      wildcard: false
-    });
-    app.setNotFoundHandler((req, reply) => {
-      if (req.raw.url?.startsWith("/api")) {
-        return reply.code(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found." } });
-      }
-      reply.sendFile("index.html", webDist);
-    });
-  } else {
-    app.setNotFoundHandler((_req, reply) => {
-      reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
+      prefix: "/assets/",
+      decorateReply: false
     });
   }
+  const marketingRoutes = /* @__PURE__ */ new Set([
+    "/",
+    "/about",
+    "/about/",
+    "/contact",
+    "/contact/",
+    "/privacy-policy",
+    "/privacy-policy/",
+    "/terms-and-conditions",
+    "/terms-and-conditions/",
+    "/refund-policy",
+    "/refund-policy/"
+  ]);
+  app.setNotFoundHandler((req, reply) => {
+    const rawUrl = (req.raw.url || "/").split("?")[0];
+    if (rawUrl.startsWith("/api")) {
+      return reply.code(404).send({ error: { code: "NOT_FOUND", message: "API endpoint not found." } });
+    }
+    if (rawUrl === "/login" || rawUrl === "/login/") {
+      return reply.redirect("/sign-in");
+    }
+    if (existsSync(siteDist) && marketingRoutes.has(rawUrl)) {
+      const clean = rawUrl.replace(/\/$/, "") || "/index";
+      const file = join(siteDist, `${clean === "/index" ? "index" : clean.slice(1)}/index.html`);
+      const directFile = join(siteDist, `${clean === "/index" ? "index" : clean.slice(1)}.html`);
+      if (existsSync(file))
+        return reply.type("text/html; charset=utf-8").sendFile(file.slice(siteDist.length + 1), siteDist);
+      if (existsSync(directFile))
+        return reply.type("text/html; charset=utf-8").sendFile(directFile.slice(siteDist.length + 1), siteDist);
+    }
+    if (existsSync(siteDist)) {
+      const siteFile = join(siteDist, rawUrl.slice(1));
+      if (existsSync(siteFile) && !rawUrl.endsWith("/")) {
+        return reply.sendFile(rawUrl.slice(1), siteDist);
+      }
+    }
+    if (existsSync(webDist)) {
+      const webFile = join(webDist, rawUrl.slice(1));
+      if (existsSync(webFile) && !rawUrl.endsWith("/")) {
+        return reply.sendFile(rawUrl.slice(1), webDist);
+      }
+    }
+    if (existsSync(webDist)) {
+      return reply.type("text/html; charset=utf-8").sendFile("index.html", webDist);
+    }
+    reply.code(404).send({ error: { code: "NOT_FOUND", message: "Not found." } });
+  });
   const portOrSocket = resolvePort();
   console.log(`\u{1F680} Starting Stamp \u2014 PORT env="${process.env.PORT || env.PORT}" resolved="${portOrSocket}" db=${dbReady ? "ready" : "NOT SET"}`);
   try {

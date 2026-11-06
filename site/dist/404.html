@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en-IN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found — Stamp</title><meta name="description" content="The page you are looking for does not exist."><!-- Canonical --><link rel="canonical" href="https://stamp.example.com/404/"><!-- Favicon --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:title" content="Page not found — Stamp"><meta property="og:description" content="The page you are looking for does not exist."><meta property="og:image" content="https://stamp.example.com/images/og-image.jpg"><meta property="og:url" content="https://stamp.example.com/404/"><meta property="og:site_name" content="Stamp"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Page not found — Stamp"><meta name="twitter:description" content="The page you are looking for does not exist."><meta name="twitter:image" content="https://stamp.example.com/images/og-image.jpg"><!-- JSON-LD --><style>.lost[data-astro-cid-zetdm5md]{display:flex;align-items:center;justify-content:center;min-height:calc(100dvh - var(--header-height) - 200px);padding:var(--s-9) 0;text-align:left}.lost__inner[data-astro-cid-zetdm5md]{max-width:32rem}.lost__stamp[data-astro-cid-zetdm5md]{margin-bottom:var(--s-5);transform:rotate(-4deg)}.lost__title[data-astro-cid-zetdm5md]{font-size:var(--f-h2);margin-bottom:var(--s-4)}.lost__text[data-astro-cid-zetdm5md]{color:var(--c-ink-muted);margin-bottom:var(--s-6)}
+</style>
+<link rel="stylesheet" href="/_assets/about.DUyU0fTx.css"></head> <body> <a class="skip-link" href="#main">Skip to content</a> <header class="header" id="site-header" data-scrolled="false" data-astro-cid-3ef6ksr2> <div class="header__progress" aria-hidden="true" data-astro-cid-3ef6ksr2> <div class="header__progress-bar" id="reading-progress" data-astro-cid-3ef6ksr2></div> </div> <div class="header__inner" data-astro-cid-3ef6ksr2> <a href="/" class="header__logo" aria-label="Stamp — home" data-astro-cid-3ef6ksr2> <svg class="header__mark" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" data-astro-cid-3ef6ksr2> <rect x="2" y="2" width="24" height="24" rx="5" stroke="currentColor" stroke-width="2.5" fill="none" data-astro-cid-3ef6ksr2></rect> <circle cx="10" cy="10" r="2.5" fill="currentColor" data-astro-cid-3ef6ksr2></circle> <circle cx="18" cy="10" r="2.5" fill="currentColor" data-astro-cid-3ef6ksr2></circle> <circle cx="10" cy="18" r="2.5" fill="currentColor" data-astro-cid-3ef6ksr2></circle> <circle cx="18" cy="18" r="2.5" fill="var(--c-violet)" opacity="0.5" data-astro-cid-3ef6ksr2></circle> </svg> <span class="header__brand" data-astro-cid-3ef6ksr2>Stamp</span> </a> <nav class="header__nav" id="site-nav" aria-label="Main navigation" data-astro-cid-3ef6ksr2> <ul class="header__links" data-astro-cid-3ef6ksr2> <li data-astro-cid-3ef6ksr2><a href="/" class="header__link" data-astro-cid-3ef6ksr2>Home</a></li> <li data-astro-cid-3ef6ksr2><a href="/about" class="header__link" data-astro-cid-3ef6ksr2>About</a></li> <li data-astro-cid-3ef6ksr2><a href="/contact" class="header__link" data-astro-cid-3ef6ksr2>Contact</a></li> <li data-astro-cid-3ef6ksr2><a href="/sign-in" class="header__link" data-astro-cid-3ef6ksr2>Log In</a></li> </ul> <a href="/contact" class="btn btn--primary header__cta" data-astro-cid-3ef6ksr2>Start a pilot</a> </nav> <button class="header__menu-btn" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu" data-astro-cid-3ef6ksr2> <span class="header__menu-icon" aria-hidden="true" data-astro-cid-3ef6ksr2> <span data-astro-cid-3ef6ksr2></span> <span data-astro-cid-3ef6ksr2></span> <span data-astro-cid-3ef6ksr2></span> </span> </button> </div> </header>  <script>
+  // Header scroll behaviour — vanilla, no framework
+  (function () {
+    const header = document.getElementById('site-header');
+    const progress = document.getElementById('reading-progress');
+    const menuBtn = document.getElementById('menu-toggle');
+    const nav = document.getElementById('site-nav');
+    let lastScroll = 0;
+    let ticking = false;
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        const y = window.scrollY;
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docH > 0 ? Math.min((y / docH) * 100, 100) : 0;
+
+        // Reading progress
+        if (progress) progress.style.width = pct + '%';
+
+        // Solid background after 24px
+        header.setAttribute('data-scrolled', y > 24 ? 'true' : 'false');
+
+        // Hide on scroll down, show on scroll up (mobile only)
+        if (window.innerWidth < 1024) {
+          if (y > lastScroll && y > 120) {
+            header.setAttribute('data-hidden', 'true');
+          } else {
+            header.removeAttribute('data-hidden');
+          }
+        } else {
+          header.removeAttribute('data-hidden');
+        }
+
+        lastScroll = y;
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Mobile menu toggle
+    if (menuBtn && nav) {
+      menuBtn.addEventListener('click', function () {
+        const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
+        menuBtn.setAttribute('aria-expanded', String(!isOpen));
+        menuBtn.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
+        nav.setAttribute('data-open', String(!isOpen));
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+      });
+    }
+  })();
+</script> <main id="main">  <section class="lost" data-astro-cid-zetdm5md> <div class="lost__inner container" data-astro-cid-zetdm5md> <div class="lost__stamp" aria-hidden="true" data-astro-cid-zetdm5md> <svg width="120" height="120" viewBox="0 0 120 120" fill="none" data-astro-cid-zetdm5md> <defs data-astro-cid-zetdm5md> <filter id="ink-bleed-404" data-astro-cid-zetdm5md> <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" result="noise" seed="3" data-astro-cid-zetdm5md></feTurbulence> <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" data-astro-cid-zetdm5md></feDisplacementMap> </filter> </defs> <circle cx="60" cy="60" r="48" stroke="var(--c-violet)" stroke-width="4" fill="none" opacity="0.2" filter="url(#ink-bleed-404)" transform="rotate(-6, 60, 60)" data-astro-cid-zetdm5md></circle> <text x="60" y="68" text-anchor="middle" font-family="var(--ff-display)" font-size="32" font-weight="700" fill="var(--c-violet)" opacity="0.25" filter="url(#ink-bleed-404)" transform="rotate(-6, 60, 60)" data-astro-cid-zetdm5md>404</text> </svg> </div> <h1 class="lost__title" data-astro-cid-zetdm5md>This page wandered off.</h1> <p class="lost__text" data-astro-cid-zetdm5md>
+The page you are looking for does not exist, or it has been moved.
+</p> <a href="/" class="btn btn--primary" data-astro-cid-zetdm5md>Back to home</a> </div> </section>  </main> <footer class="footer" data-astro-cid-sz7xmlte> <div class="footer__rule" aria-hidden="true" data-astro-cid-sz7xmlte></div> <div class="footer__inner container" data-astro-cid-sz7xmlte> <div class="footer__top" data-astro-cid-sz7xmlte> <div class="footer__brand-col" data-astro-cid-sz7xmlte> <a href="/" class="footer__logo" aria-label="Stamp — home" data-astro-cid-sz7xmlte> <svg class="footer__mark" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true" data-astro-cid-sz7xmlte> <rect x="2" y="2" width="24" height="24" rx="5" stroke="currentColor" stroke-width="2.5" fill="none" data-astro-cid-sz7xmlte></rect> <circle cx="10" cy="10" r="2.5" fill="currentColor" data-astro-cid-sz7xmlte></circle> <circle cx="18" cy="10" r="2.5" fill="currentColor" data-astro-cid-sz7xmlte></circle> <circle cx="10" cy="18" r="2.5" fill="currentColor" data-astro-cid-sz7xmlte></circle> <circle cx="18" cy="18" r="2.5" fill="var(--c-violet)" opacity="0.5" data-astro-cid-sz7xmlte></circle> </svg> <span class="footer__brand-name" data-astro-cid-sz7xmlte>Stamp</span> </a> <p class="footer__tagline t-small" data-astro-cid-sz7xmlte>Paper stamp cards, without the paper.</p> </div> <nav class="footer__nav" aria-label="Footer navigation" data-astro-cid-sz7xmlte> <div class="footer__nav-group" data-astro-cid-sz7xmlte> <span class="footer__nav-label t-mono" data-astro-cid-sz7xmlte>Pages</span> <ul class="footer__nav-list" data-astro-cid-sz7xmlte> <li data-astro-cid-sz7xmlte><a href="/" data-astro-cid-sz7xmlte>Home</a></li> <li data-astro-cid-sz7xmlte><a href="/about" data-astro-cid-sz7xmlte>About</a></li> <li data-astro-cid-sz7xmlte><a href="/contact" data-astro-cid-sz7xmlte>Contact</a></li> </ul> </div> <div class="footer__nav-group" data-astro-cid-sz7xmlte> <span class="footer__nav-label t-mono" data-astro-cid-sz7xmlte>Legal</span> <ul class="footer__nav-list" data-astro-cid-sz7xmlte> <li data-astro-cid-sz7xmlte><a href="/privacy-policy" data-astro-cid-sz7xmlte>Privacy policy</a></li> <li data-astro-cid-sz7xmlte><a href="/terms-and-conditions" data-astro-cid-sz7xmlte>Terms and conditions</a></li> <li data-astro-cid-sz7xmlte><a href="/refund-policy" data-astro-cid-sz7xmlte>Refund policy</a></li> </ul> </div> <div class="footer__nav-group" data-astro-cid-sz7xmlte> <span class="footer__nav-label t-mono" data-astro-cid-sz7xmlte>Reach us</span> <ul class="footer__nav-list" data-astro-cid-sz7xmlte> <li data-astro-cid-sz7xmlte> <a href="https://wa.me/919876543210?text=Hi%2C%20I%20run%20a%20shop%20and%20I%20am%20interested%20in%20Stamp." target="_blank" rel="noopener noreferrer" data-astro-cid-sz7xmlte>
+WhatsApp
+</a> </li> <li data-astro-cid-sz7xmlte><a href="mailto:hello@stamp.example.com" data-astro-cid-sz7xmlte>hello@stamp.example.com</a></li> <li data-astro-cid-sz7xmlte><a href="tel:+919876543210" data-astro-cid-sz7xmlte>+919876543210</a></li> </ul> </div> </nav> </div> <div class="footer__bottom" data-astro-cid-sz7xmlte> <p class="footer__legal t-small" data-astro-cid-sz7xmlte>
+© 2026 [[FILL: legal entity name, e.g. &quot;Stamp Technologies LLP&quot;]]. Pune.
+</p> <p class="footer__address t-small" data-astro-cid-sz7xmlte> [[FILL: full registered address]] </p> </div> </div> </footer>  </body></html> 

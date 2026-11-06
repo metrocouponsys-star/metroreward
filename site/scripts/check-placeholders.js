@@ -29,7 +29,7 @@ async function walk(dir) {
 }
 
 async function main() {
-  if (process.env.ALLOW_PLACEHOLDERS === '1') {
+  if (process.env.ALLOW_PLACEHOLDERS === '1' || process.env.ALLOW_PLACEHOLDERS?.trim() === '1') {
     console.log('⚠  ALLOW_PLACEHOLDERS=1 — skipping placeholder check.');
     process.exit(0);
   }
