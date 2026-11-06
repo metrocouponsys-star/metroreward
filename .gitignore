@@ -6,6 +6,7 @@ site/dist/
 site/.astro/
 .vscode/
 .env
+import.env
 *.js.map
 coverage/
 .DS_Store

@@ -6,3 +6,11 @@ declare module '*.module.css' {
   export default classes;
 }
 
+declare module 'qrcode' {
+  const qrcode: any;
+  export default qrcode;
+  export const toCanvas: any;
+  export const toDataURL: any;
+  export const toString: any;
+}
+
