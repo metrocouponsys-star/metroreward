@@ -102,11 +102,23 @@ if (existsSync(webDist)) {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 const portOrSocket = resolvePort();
-console.log(`🚀 Starting Stamp — PORT env="${env.PORT}" resolved="${portOrSocket}" db=${dbReady ? 'ready' : 'NOT SET'}`);
+console.log(`🚀 Starting Stamp — PORT env="${process.env.PORT || env.PORT}" resolved="${portOrSocket}" db=${dbReady ? 'ready' : 'NOT SET'}`);
 try {
-  // Fastify accepts both numeric ports and Unix socket paths
-  await app.listen({ port: portOrSocket as number, host: '0.0.0.0' });
-  console.log(`✅  Stamp server listening on ${portOrSocket}`);
+  if (typeof portOrSocket === 'string' && isNaN(Number(portOrSocket))) {
+    // Unix socket
+    await app.listen({ path: portOrSocket });
+    console.log(`✅ Stamp server listening on socket ${portOrSocket}`);
+  } else {
+    const port = typeof portOrSocket === 'number' ? portOrSocket : parseInt(portOrSocket, 10) || 3000;
+    try {
+      await app.listen({ port, host: '0.0.0.0' });
+      console.log(`✅ Stamp server listening on 0.0.0.0:${port}`);
+    } catch {
+      // Fallback: listen without explicit host if 0.0.0.0 fails
+      await app.listen({ port });
+      console.log(`✅ Stamp server listening on port ${port}`);
+    }
+  }
 } catch (err) {
   app.log.error(err);
   console.error('❌ Fastify app.listen failed:', err);

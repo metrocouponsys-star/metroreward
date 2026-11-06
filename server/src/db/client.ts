@@ -6,12 +6,10 @@ import * as schema from './schema.ts';
 let _pool: mysql.Pool | null = null;
 
 export function getPool(): mysql.Pool {
-  if (!dbReady) {
-    throw new Error('DATABASE_URL is not configured. Set it in Hostinger → Web App → Environment Variables.');
-  }
   if (!_pool) {
+    const uri = (dbReady && env.DATABASE_URL) ? env.DATABASE_URL : 'mysql://localhost:3306/dummy';
     _pool = mysql.createPool({
-      uri: env.DATABASE_URL,
+      uri,
       timezone: 'Z',
       waitForConnections: true,
       connectionLimit: 10,
