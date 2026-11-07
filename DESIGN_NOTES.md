@@ -365,3 +365,4 @@
 11. **7 Empty-State Vignettes:** Empty Card, Open Ledger & Pencil, Empty Foil Ticket, Cut-Wire Offline QR, Bell Reminder, Closed Shutter, Calm Seal.
 12. **Hierarchy Map Elements:** Super Admin Node, Merchant Node, Customer Cluster, Connected Bezier Curves, Flow Dots.
 13. **Status Marks:** Counted (Check Seal), Pending (Dashed Circle), Voided (Struck-through Seal), Redeemed (Double Check), Expired (Faded Seal).
+

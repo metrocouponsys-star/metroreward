@@ -8,7 +8,7 @@ import './styles/globals.css';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './hooks/useAuth.tsx';
-import { AdminShopBar } from './components/AdminShopBar.tsx';
+import { AppShell } from './components/layout/AppShell.tsx';
 
 // Lazy page imports
 import { lazy, Suspense } from 'react';
@@ -54,12 +54,11 @@ function LoadingScreen() {
   );
 }
 
-function ShopLayout() {
+function PortalLayout() {
   return (
-    <>
-      <AdminShopBar />
+    <AppShell>
       <Outlet />
-    </>
+    </AppShell>
   );
 }
 
@@ -97,10 +96,10 @@ function AppRoutes() {
         {user?.role === 'admin' && (
           <>
             <Route path="/" element={<Navigate to="/admin" replace />} />
-            <Route path="/admin" element={<AdminShopsPage />} />
-            <Route path="/admin/create-shop" element={<AdminCreateShopPage />} />
-            <Route path="/admin/flags" element={<AdminFlagsPage />} />
-            <Route element={<ShopLayout />}>
+            <Route element={<PortalLayout />}>
+              <Route path="/admin" element={<AdminShopsPage />} />
+              <Route path="/admin/create-shop" element={<AdminCreateShopPage />} />
+              <Route path="/admin/flags" element={<AdminFlagsPage />} />
               <Route path="/shop" element={<ShopDashboardPage />} />
               <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
               <Route path="/shop/print-qr" element={<PrintQrPage />} />
@@ -117,7 +116,7 @@ function AppRoutes() {
         {user?.role === 'shop' && (
           <>
             <Route path="/" element={<Navigate to="/shop" replace />} />
-            <Route element={<ShopLayout />}>
+            <Route element={<PortalLayout />}>
               <Route path="/shop" element={<ShopDashboardPage />} />
               <Route path="/shop/scan" element={<ShopScanCustomerPage />} />
               <Route path="/shop/print-qr" element={<PrintQrPage />} />

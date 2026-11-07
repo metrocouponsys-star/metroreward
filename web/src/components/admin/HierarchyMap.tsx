@@ -470,3 +470,4 @@ export function HierarchyMap({ shops = [], onSelectShop, onImpersonate }: Hierar
     </div>
   );
 }
+

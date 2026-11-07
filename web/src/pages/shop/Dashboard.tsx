@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api.ts';
 import { useAuth } from '../../hooks/useAuth.tsx';
-import { S } from '../../strings.ts';
 import { toISTDateTime } from '../../lib/format.ts';
 
 interface Summary {
@@ -37,7 +36,7 @@ function greeting() {
 }
 
 export default function ShopDashboardPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const { data: summary } = useQuery({
@@ -63,476 +62,376 @@ export default function ShopDashboardPage() {
   const memberCount = customersData?.customers.length ?? 0;
 
   return (
-    <div className="page" style={{ maxWidth: 1080, margin: '0 auto', paddingBottom: '3rem' }}>
-      {/* Top Bar for standalone mobile / quick controls */}
-      <nav className="topbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="topbar-title">{shopName}</span>
+    <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* ── 1. Greeting & Quick Action Banner (Metrocard style) ── */}
+      <section
+        style={{
+          background: 'linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 50%, #F0FDFA 100%)',
+          border: '1px solid #FED7AA',
+          borderRadius: '16px',
+          padding: '20px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px',
+          boxShadow: '0 2px 10px rgba(255,107,53,0.04)',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+            <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C2410C' }}>
+              Counter Active · Live Desk
+            </span>
+          </div>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '2px 0' }}>
+            {greeting()}, {shopName}!
+          </h1>
+          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
+            Ready to issue stamps, redeem reward coupons, and engage your regulars.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           {shopSlug && (
             <a
               href={`/s/${shopSlug}`}
               target="_blank"
               rel="noreferrer"
-              style={{ fontSize: '0.75rem', color: 'var(--orange-dark)', textDecoration: 'underline' }}
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#64748B',
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+              }}
             >
               /s/{shopSlug} ↗
             </a>
           )}
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <Link to="/shop/scan" className="btn-primary" style={{ padding: '0.375rem 0.75rem', fontSize: '0.8125rem' }}>
-            📷 Scan Customer
+          <Link
+            to="/shop/scan"
+            style={{
+              height: '42px',
+              padding: '0 20px',
+              borderRadius: '10px',
+              border: 'none',
+              background: '#FF6B35',
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: '13.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              textDecoration: 'none',
+              boxShadow: '0 4px 14px rgba(255,107,53,0.35)',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+              qr_code_scanner
+            </span>
+            Scan Customer QR
           </Link>
-          <button className="btn-ghost" onClick={logout} style={{ padding: '0.375rem 0.625rem', fontSize: '0.8125rem' }}>
-            {S.signOut}
-          </button>
         </div>
-      </nav>
+      </section>
 
-      <div className="content" style={{ padding: '1.25rem 0' }}>
-        {/* ── Greeting Banner ── */}
-        <section
-          style={{
-            background: 'linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 60%, #F0FDFA 100%)',
-            border: '1px solid #FED7AA',
-            borderRadius: '16px',
-            padding: '1.25rem 1.5rem',
-            marginBottom: '1.5rem',
-            boxShadow: 'var(--shadow-sm)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-          }}
-        >
-          <div>
-            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#C2410C', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {greeting()}, {shopName}
-            </div>
-            <h1 style={{ fontSize: '1.625rem', fontWeight: 800, color: 'var(--ink)', margin: '0.25rem 0 0.125rem' }}>
-              Counter Dashboard
-            </h1>
-            <p style={{ fontSize: '0.875rem', color: 'var(--ink-muted)', margin: 0 }}>
-              Live customer stamp issuance, rewards redemption, and member loyalty metrics.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <Link
-              to="/shop/qr"
-              className="btn-secondary"
-              style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', background: '#00D4AA', color: '#003D32' }}
-            >
-              🎟️ Display Counter QR
-            </Link>
-            <Link
-              to="/shop/print-qr"
-              className="btn-outline"
-              style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
-            >
-              🖨️ Print Counter Poster
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Big CTA: Scan Customer QR (PRD Screen 2.1) ── */}
+      {/* ── 2. Stat Blocks with Left Color Stripe (Metrocard style) ── */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+          gap: '14px',
+        }}
+      >
+        {/* Today's Stamps */}
         <div
-          onClick={() => navigate('/shop/scan')}
+          onClick={() => navigate('/shop/feed')}
           style={{
-            background: 'linear-gradient(135deg, #FF6B35 0%, #E85A28 100%)',
-            color: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '1.25rem 1.5rem',
-            marginBottom: '1.5rem',
+            background: '#FFFFFF',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            border: '1px solid #E2E8F0',
+            position: 'relative',
+            overflow: 'hidden',
             cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(255, 107, 53, 0.25)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 107, 53, 0.35)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = '';
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(255, 107, 53, 0.25)';
+            boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: '28px', color: '#fff' }}>
-                qr_code_scanner
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#FF6B35' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Stamps Today
+            </span>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFF4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF6B35' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                loyalty
               </span>
             </div>
-            <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>Scan Customer QR Code</div>
-              <div style={{ fontSize: '0.8125rem', opacity: 0.9 }}>
-                Tap here to open camera and stamp customer card in under 3 seconds
-              </div>
-            </div>
           </div>
-          <span
-            style={{
-              background: 'rgba(255, 255, 255, 0.25)',
-              padding: '0.375rem 0.875rem',
-              borderRadius: '8px',
-              fontWeight: 700,
-              fontSize: '0.8125rem',
-            }}
-          >
-            Open Scanner →
-          </span>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }} className="tabular">
+            {summary?.stampsToday ?? 0}
+          </div>
+          <div style={{ fontSize: '11.5px', color: '#FF6B35', marginTop: '4px', fontWeight: 600 }}>
+            Recorded at counter
+          </div>
         </div>
 
-        {/* ── 4 Stat Cards with Color Stripes (PRD 2.1) ── */}
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-            gap: '0.875rem',
-            marginBottom: '1.75rem',
-          }}
-        >
-          {/* Stamps Today */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '16px',
-              padding: '1.125rem',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-card)',
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#FF6B35' }} />
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Stamps Today
-            </div>
-            <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--ink)' }} className="tabular">
-              {summary?.stampsToday ?? 0}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '0.25rem' }}>
-              Visits recorded today
-            </div>
-          </div>
-
-          {/* Rewards Redeemed */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '16px',
-              padding: '1.125rem',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-card)',
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#00D4AA' }} />
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Rewards Redeemed
-            </div>
-            <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--ink)' }} className="tabular">
-              {summary?.redeemedToday ?? 0}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '0.25rem' }}>
-              Codes claimed at counter
-            </div>
-          </div>
-
-          {/* Scratch Prizes Won */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '16px',
-              padding: '1.125rem',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-card)',
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#F59E0B' }} />
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Prizes Won
-            </div>
-            <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--ink)' }} className="tabular">
-              {summary?.scratchWinsToday ?? 0}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '0.25rem' }}>
-              Scratch cards revealed today
-            </div>
-          </div>
-
-          {/* Enrolled Members */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '16px',
-              padding: '1.125rem',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-card)',
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#0A1628' }} />
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Total Members
-            </div>
-            <div style={{ fontSize: '1.875rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--ink)' }} className="tabular">
-              {memberCount}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '0.25rem' }}>
-              Customers in your directory
-            </div>
-          </div>
-        </section>
-
-        {/* ── Quick Action Grid (6 Tiles) ── */}
-        <h2 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '0.75rem', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-          Quick Counter Actions
-        </h2>
+        {/* Regular Members */}
         <div
+          onClick={() => navigate('/shop/customers')}
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-            gap: '0.75rem',
-            marginBottom: '2rem',
+            background: '#FFFFFF',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            border: '1px solid #E2E8F0',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
           }}
         >
-          <button
-            onClick={() => navigate('/shop/scan')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--orange-light)', color: 'var(--orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>qr_code_scanner</span>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#00D4AA' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Total Regulars
+            </span>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#E0FFF6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00D4AA' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                group
+              </span>
             </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Scan Customer</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/shop/qr')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E0FFF6', color: '#00A885', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>qr_code_2</span>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Counter QR</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/shop/customers')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>groups</span>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Members ({memberCount})</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/shop/redeem')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>redeem</span>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Redeem Reward</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/shop/print-qr')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>print</span>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Print Poster</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/shop/program')}
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--hairline)',
-              borderRadius: '14px',
-              padding: '16px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F1F5F9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>tune</span>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>Program Rules</span>
-          </button>
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }} className="tabular">
+            {memberCount}
+          </div>
+          <div style={{ fontSize: '11.5px', color: '#00D4AA', marginTop: '4px', fontWeight: 600 }}>
+            Registered customers
+          </div>
         </div>
 
-        {/* ── Live Activity Ledger (PRD 2.1) ── */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 800, margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-            Live Counter Activity
-          </h2>
-          <Link to="/shop/feed" style={{ fontSize: '0.8125rem', color: 'var(--orange-dark)', fontWeight: 700 }}>
-            Full Activity Feed →
-          </Link>
-        </div>
-
+        {/* Scratch Wins Today */}
         <div
           style={{
             background: '#FFFFFF',
-            border: '1px solid var(--hairline)',
-            borderRadius: '16px',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            border: '1px solid #E2E8F0',
+            position: 'relative',
             overflow: 'hidden',
-            boxShadow: 'var(--shadow-card)',
+            boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
           }}
         >
-          {!feed?.events.length ? (
-            <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--ink-muted)' }}>
-              <p style={{ margin: 0, fontWeight: 600 }}>{S.noActivity}</p>
-              <p style={{ fontSize: '0.8125rem', margin: '0.25rem 0 0' }}>
-                When customers scan your counter QR, live visits appear here in real time.
-              </p>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#F59E0B' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Scratch Wins
+            </span>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B45309' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                stars
+              </span>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {feed.events.slice(0, 10).map((ev, i) => (
-                <div
-                  key={ev.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.875rem 1.25rem',
-                    borderBottom: i < feed.events.length - 1 ? '1px solid var(--hairline)' : 'none',
-                    gap: '1rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
-                        background: 'var(--orange-light)',
-                        color: 'var(--orange)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 800,
-                        fontSize: '14px',
-                      }}
-                    >
-                      🎟️
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--ink)' }}>
-                        {ev.customerName || 'Loyal Customer'}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)' }}>
-                        {ev.customerPhone}
-                      </div>
-                    </div>
-                  </div>
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }} className="tabular">
+            {summary?.scratchWinsToday ?? 0}
+          </div>
+          <div style={{ fontSize: '11.5px', color: '#B45309', marginTop: '4px', fontWeight: 600 }}>
+            Won by customers today
+          </div>
+        </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', textAlign: 'right' }}>
-                      {toISTDateTime(ev.createdAt)}
-                    </div>
-                    <span
-                      style={{
-                        padding: '0.1875rem 0.5rem',
-                        borderRadius: '6px',
-                        fontSize: '0.6875rem',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        background: ev.status === 'counted' ? '#DCFCE7' : ev.status === 'pending' ? '#FEF3C7' : '#FEE2E2',
-                        color: ev.status === 'counted' ? '#15803D' : ev.status === 'pending' ? '#B45309' : '#B91C1C',
-                      }}
-                    >
-                      {ev.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+        {/* Redeemed Today */}
+        <div
+          onClick={() => navigate('/shop/redeem')}
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            border: '1px solid #E2E8F0',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
+          }}
+        >
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#6366F1' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Redeemed Today
+            </span>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366F1' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                redeem
+              </span>
             </div>
-          )}
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }} className="tabular">
+            {summary?.redeemedToday ?? 0}
+          </div>
+          <div style={{ fontSize: '11.5px', color: '#6366F1', marginTop: '4px', fontWeight: 600 }}>
+            Completed rewards
+          </div>
         </div>
       </div>
+
+      {/* ── 3. Quick Action Tiles (Metrocard style) ── */}
+      <div>
+        <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '12px' }}>
+          Counter Quick Actions
+        </h3>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '12px',
+          }}
+        >
+          {[
+            { to: '/shop/scan', icon: 'qr_code_scanner', label: 'Scan Customer QR', color: '#FF6B35', bg: '#FFF4EF' },
+            { to: '/shop/redeem', icon: 'redeem', label: 'Redeem Reward Code', color: '#6366F1', bg: '#EEF2FF' },
+            { to: '/shop/program', icon: 'palette', label: 'Card Studio & Rules', color: '#00D4AA', bg: '#E0FFF6' },
+            { to: '/shop/qr', icon: 'qr_code_2', label: 'Counter Display QR', color: '#F59E0B', bg: '#FEF3C7' },
+            { to: '/shop/print-qr', icon: 'print', label: 'Print QR Poster', color: '#0F172A', bg: '#F1F5F9' },
+            { to: '/shop/feed', icon: 'history', label: 'Daily Khata Ledger', color: '#10B981', bg: '#ECFDF5' },
+          ].map((action) => (
+            <Link
+              key={action.to}
+              to={action.to}
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '14px',
+                padding: '16px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '10px',
+                textDecoration: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+            >
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: action.bg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '22px', color: action.color, fontVariationSettings: "'FILL' 1" }}>
+                  {action.icon}
+                </span>
+              </div>
+              <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#0F172A', textAlign: 'center', lineHeight: 1.3 }}>
+                {action.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 4. Live Counter Activity Feed (Daily Khata) ── */}
+      <section
+        style={{
+          background: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          padding: '20px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0F172A' }}>
+              Live Counter Activity Feed
+            </h3>
+            <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0' }}>
+              Real-time stamp visits, scratch wins, and rewards recorded at your counter
+            </p>
+          </div>
+          <Link to="/shop/feed" style={{ fontSize: '12px', fontWeight: 700, color: '#FF6B35', textDecoration: 'none' }}>
+            View Full Khata →
+          </Link>
+        </div>
+
+        {feed?.events && feed.events.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {feed.events.slice(0, 6).map((ev, idx) => (
+              <div
+                key={ev.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: idx < 5 ? '1px solid #F1F5F9' : 'none',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: ev.status === 'counted' ? '#E6F5EE' : ev.status === 'pending' ? '#FEF3C7' : '#FEE2E2',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: ev.status === 'counted' ? '#1F8A5B' : ev.status === 'pending' ? '#B45309' : '#B91C1C',
+                      fontWeight: 800,
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                      {ev.status === 'counted' ? 'check' : ev.status === 'pending' ? 'schedule' : 'block'}
+                    </span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
+                      {ev.customerName || ev.customerPhone || 'Member Visit'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>
+                      {toISTDateTime(ev.createdAt)}
+                    </div>
+                  </div>
+                </div>
+
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    background: ev.status === 'counted' ? '#E6F5EE' : ev.status === 'pending' ? '#FEF3C7' : '#FEE2E2',
+                    color: ev.status === 'counted' ? '#1F8A5B' : ev.status === 'pending' ? '#B45309' : '#B91C1C',
+                  }}
+                >
+                  {ev.status === 'counted' ? '+1 Stamp' : ev.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '32px 16px', color: '#64748B' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#CBD5E1', marginBottom: '8px' }}>
+              receipt_long
+            </span>
+            <p style={{ fontSize: '13px', margin: 0 }}>No stamp visits recorded yet today.</p>
+            <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>
+              Show your counter QR to customers to start recording visits.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
