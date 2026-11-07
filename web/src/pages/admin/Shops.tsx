@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, StampError } from '../../lib/api.ts';
 import { useAuth } from '../../hooks/useAuth.tsx';
 import { S } from '../../strings.ts';
+import { HierarchyMap } from '../../components/admin/HierarchyMap.tsx';
 
 interface AdminStats {
   totalShops: number;
@@ -182,6 +183,21 @@ export default function AdminShopsPage() {
   const activeCount = shops.filter((s) => s.isActive).length;
   const suspendedCount = shops.filter((s) => !s.isActive).length;
 
+  const hierarchyShops = useMemo(() => {
+    const colors = ['#FF6B35', '#4B2E9A', '#1F5C3E', '#1D5F8A', '#A33B26', '#C07D1E'];
+    const icons = ['chai', 'scissors', 'croissant', 'dumbbell', 'burger', 'coffee'];
+    return shops.map((s, idx) => ({
+      id: s.id,
+      name: s.name,
+      slug: s.slug,
+      status: s.isActive ? 'active' : 'suspended',
+      customerCount: s.memberCount ?? 0,
+      stampsCount: s.totalStamps ?? 0,
+      color: colors[idx % colors.length],
+      icon: icons[idx % icons.length],
+    }));
+  }, [shops]);
+
   const openEdit = (s: ShopItem) => {
     setEditTarget(s);
     setEditForm({
@@ -220,6 +236,13 @@ export default function AdminShopsPage() {
           </span>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <Link
+            to="/__atlas"
+            className="btn-ghost"
+            style={{ padding: '0.45rem 0.75rem', fontSize: '0.8125rem', color: '#6366F1', fontWeight: 600 }}
+          >
+            🎨 Design Atlas
+          </Link>
           <button
             onClick={() => setShowAddModal(true)}
             className="btn-primary"
@@ -234,6 +257,12 @@ export default function AdminShopsPage() {
       </nav>
 
       <div className="content" style={{ padding: '1.25rem 0' }}>
+        {/* Interactive Role Hierarchy & Tenant Isolation Map (M13) */}
+        <HierarchyMap
+          shops={hierarchyShops}
+          onImpersonate={(s) => openDashboard(s.id)}
+        />
+
         {/* KPI Stat Cards (Screen 3.1) */}
         <section
           style={{

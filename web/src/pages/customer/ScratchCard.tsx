@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api.ts';
 import { S } from '../../strings.ts';
+import { PrizeGlyph } from '../../components/svg/Icons.tsx';
 import styles from './ScratchCard.module.css';
 
 interface ScratchResult {
@@ -147,17 +148,18 @@ export default function ScratchCardPage() {
         {/* Prize area (behind foil) */}
         <div className={styles.prizeArea}>
           {(revealed || alreadyRevealed) && (
-            <div className={styles.prize} data-win={isWin}>
+            <div className={styles.prize} data-win={isWin} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem' }}>
               {isWin ? (
                 <>
-                  <div className={styles.prizeTrophy} aria-hidden>🏆</div>
-                  <div className={styles.prizeTitle}>{S.youWon}</div>
-                  <div className={styles.prizeValue}>{prize!.title}</div>
+                  <PrizeGlyph type="free_item" size={56} />
+                  <div className={styles.prizeTitle} style={{ fontWeight: 800, fontSize: '1rem', color: '#1F8A5B' }}>{S.youWon}</div>
+                  <div className={styles.prizeValue} style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A' }}>{prize!.title}</div>
                 </>
               ) : (
                 <>
-                  <div className={styles.noTrophy} aria-hidden>😔</div>
-                  <div className={styles.prizeTitle}>{S.betterLuck}</div>
+                  <PrizeGlyph type="no_prize" size={56} />
+                  <div className={styles.prizeTitle} style={{ fontWeight: 700, fontSize: '1rem', color: '#475569' }}>Better luck next visit!</div>
+                  <div style={{ fontSize: '0.8125rem', color: '#64748B' }}>Keep collecting stamps to unlock guaranteed rewards.</div>
                 </>
               )}
             </div>

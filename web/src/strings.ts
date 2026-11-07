@@ -1,5 +1,12 @@
-/** All user-facing strings — replace values when translating */
-export const S = {
+export type Language = 'en' | 'hi' | 'mr';
+
+export const LANGUAGES = [
+  { code: 'en' as const, label: 'English' },
+  { code: 'hi' as const, label: 'हिन्दी' },
+  { code: 'mr' as const, label: 'मराठी' },
+];
+
+const enStrings = {
   appName: 'Stamp',
 
   // Auth
@@ -98,5 +105,150 @@ export const S = {
   addToHomeTitle: 'Add Stamp to your home screen',
   addToHomeBody: 'For the best experience, add Stamp to your iPhone home screen from the Share menu.',
   addToHomeDismiss: 'Maybe later',
-} as const;
+};
 
+const hiStrings: typeof enStrings = {
+  ...enStrings,
+  appName: 'स्टैम्प',
+  signIn: 'लॉग इन करें',
+  signOut: 'लॉग आउट',
+  enterPhone: 'अपना मोबाइल नंबर दर्ज करें',
+  sendOtp: 'ओटीपी भेजें',
+  enterOtp: '6 अंकों का कोड दर्ज करें',
+  verify: 'सत्यापित करें',
+  resendOtp: 'कोड फिर से भेजें',
+  yourName: 'आपका नाम',
+  continue: 'आगे बढ़ें',
+  otpSent: 'ओटीपी भेजा गया:',
+  otpResendIn: 'पुनः प्रयास करें',
+  seconds: 'सेकंड',
+
+  scanQr: 'दुकान पर क्यूआर कोड स्कैन करें',
+  stampAdded: 'स्टैम्प जुड़ गया!',
+  stampPending: 'स्टैम्प स्वीकृति के लिए भेजा गया।',
+  stampsOf: 'में से',
+  stampsRequired: 'इनाम के लिए आवश्यक स्टैम्प्स',
+  nextStampAt: 'आपका अगला स्टैम्प उपलब्ध होगा:',
+
+  yourRewards: 'आपके इनाम',
+  claimReward: 'इनाम क्लेम करें',
+  showCode: 'यह कोड दुकानदार को दिखाएं',
+  codeExpiresIn: 'समाप्त होने में समय:',
+  rewardEarned: 'आपने एक इनाम जीता है!',
+  noRewards: 'अभी कोई इनाम नहीं। स्टैम्प जमा करते रहें!',
+
+  scratchToReveal: 'इनाम देखने के लिए स्क्रैच करें',
+  revealButton: 'देखने के लिए टैप करें',
+  youWon: 'आपने जीता',
+  betterLuck: 'अगली बार बेहतर किस्मत।',
+  scratchWin: 'आपने जीता: ',
+
+  shopDashboard: 'खाता डैशबोर्ड',
+  qrDisplay: 'काउंटर क्यूआर दिखाएं',
+  redeemCode: 'कोड रिडीम करें',
+  enterCode: 'इनाम कोड दर्ज करें',
+  redeem: 'रिडीम',
+  feedTitle: 'दैनिक गतिविधि',
+  customersTitle: 'नियमित ग्राहक',
+  programSettings: 'प्रोग्राम सेटिंग्स',
+  scratchPrizes: 'स्क्रैच इनाम',
+  stampsToday: 'आज के स्टैम्प्स',
+  redeemedToday: 'आज रिडीम हुए',
+  scratchWinsToday: 'आज के स्क्रैच विनर',
+  approve: 'स्वीकार करें',
+  void: 'रद्द करें',
+  save: 'सहेजें',
+  saved: 'सहेजा गया',
+
+  genericError: 'कुछ गड़बड़ हो गई। कृपया पुनः प्रयास करें।',
+  notSignedIn: 'जारी रखने के लिए लॉग इन करें।',
+  noCards: 'दुकान पर जाएं और अपना पहला स्टैम्प पाने के लिए क्यूआर स्कैन करें।',
+};
+
+const mrStrings: typeof enStrings = {
+  ...enStrings,
+  appName: 'स्टॅम्प',
+  signIn: 'साइन इन करा',
+  signOut: 'साइन आउट',
+  enterPhone: 'तुमचा मोबाईल नंबर टाका',
+  sendOtp: 'ओटीपी पाठवा',
+  enterOtp: '6-अंकी कोड टाका',
+  verify: 'पडताळणी करा',
+  resendOtp: 'कोड पुन्हा पाठवा',
+  yourName: 'तुमचे नाव',
+  continue: 'पुढे जा',
+  otpSent: 'ओटीपी पाठवला आहे:',
+  otpResendIn: 'पुन्हा पाठवा',
+  seconds: 'सेकंद',
+
+  scanQr: 'दुकानातील क्यूआर कोड स्कॅन करा',
+  stampAdded: 'स्टॅम्प जोडला गेला!',
+  stampPending: 'स्टॅम्प मंजुरीसाठी पाठवला आहे.',
+  stampsOf: 'पैकी',
+  stampsRequired: 'बक्षिसासाठी आवश्यक स्टॅम्प्स',
+  nextStampAt: 'पुढील स्टॅम्प उपलब्ध होईल:',
+
+  yourRewards: 'तुमची बक्षिसे',
+  claimReward: 'बक्षीस मिळवा',
+  showCode: 'हा कोड दुकानदाराला दाखवा',
+  codeExpiresIn: 'मुदत संपेल:',
+  rewardEarned: 'तुम्हाला एक बक्षीस मिळाले आहे!',
+  noRewards: 'अद्याप कोणतेही बक्षीस नाही. स्टॅम्प गोळा करत राहा!',
+
+  scratchToReveal: 'बक्षीस पाहण्यासाठी स्क्रॅच करा',
+  revealButton: 'पाहण्यासाठी टॅप करा',
+  youWon: 'तुम्ही जिंकलात',
+  betterLuck: 'पुढच्या वेळी नक्की मिळेल.',
+  scratchWin: 'तुम्ही जिंकलात: ',
+
+  shopDashboard: 'दुकान डॅशबोर्ड',
+  qrDisplay: 'क्यूआर दाखवा',
+  redeemCode: 'कोड रिडीम करा',
+  enterCode: 'बक्षीस कोड टाका',
+  redeem: 'रिडीम करा',
+  feedTitle: 'दैनंदिन व्यवहार',
+  customersTitle: 'नियमित ग्राहक',
+  programSettings: 'प्रोग्राम सेटिंग्ज',
+  scratchPrizes: 'स्क्रॅच बक्षिसे',
+  stampsToday: 'आजचे स्टॅम्प्स',
+  redeemedToday: 'आज रिडीम झालेले',
+  scratchWinsToday: 'आजचे स्क्रॅच विजेते',
+  approve: 'मंजूर करा',
+  void: 'रद्द करा',
+  save: 'जतन करा',
+  saved: 'जतन केले',
+
+  genericError: 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.',
+  notSignedIn: 'पुढे जाण्यासाठी कृपया साइन इन करा.',
+  noCards: 'दुकानात जा आणि पहिला स्टॅम्प मिळवण्यासाठी क्यूआर स्कॅन करा.',
+};
+
+const dictionaries: Record<Language, typeof enStrings> = {
+  en: enStrings,
+  hi: hiStrings,
+  mr: mrStrings,
+};
+
+let currentLang: Language = (typeof localStorage !== 'undefined' && (localStorage.getItem('preferred_lang') as Language)) || 'en';
+
+export function setLanguage(lang: Language) {
+  currentLang = lang;
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('preferred_lang', lang);
+  }
+}
+
+export function getLanguage(): Language {
+  return currentLang;
+}
+
+export function getStrings(lang: Language = currentLang) {
+  return dictionaries[lang] || enStrings;
+}
+
+/** Default export S proxies to the current active language dictionary */
+export const S: typeof enStrings = new Proxy({} as typeof enStrings, {
+  get(_target, prop: keyof typeof enStrings) {
+    return dictionaries[currentLang]?.[prop] ?? enStrings[prop];
+  },
+});

@@ -18,6 +18,7 @@ const ScanLandingPage = lazy(() => import('./pages/ScanLanding.tsx'));
 
 // Customer
 const CardHomePage = lazy(() => import('./pages/customer/CardHome.tsx'));
+const CardDetailPage = lazy(() => import('./pages/customer/CardDetail.tsx'));
 const RewardsPage = lazy(() => import('./pages/customer/Rewards.tsx'));
 const ScratchCardPage = lazy(() => import('./pages/customer/ScratchCard.tsx'));
 const StampSuccessPage = lazy(() => import('./pages/customer/StampSuccess.tsx'));
@@ -37,6 +38,9 @@ const PrintQrPage = lazy(() => import('./pages/shop/PrintQr.tsx'));
 const AdminCreateShopPage = lazy(() => import('./pages/admin/CreateShop.tsx'));
 const AdminShopsPage = lazy(() => import('./pages/admin/Shops.tsx'));
 const AdminFlagsPage = lazy(() => import('./pages/admin/Flags.tsx'));
+
+// Dev Atlas
+const AtlasPage = lazy(() => import('./pages/Atlas.tsx'));
 
 const qc = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -70,6 +74,9 @@ function AppRoutes() {
         {/* Scan landing (public, redirects to sign-in if needed) */}
         <Route path="/s/:slug" element={<ScanLandingPage />} />
 
+        {/* Dev Design System Atlas */}
+        <Route path="/__atlas" element={<AtlasPage />} />
+
         {/* Sign-in */}
         <Route path="/sign-in" element={!user ? <SignInPage /> : <Navigate to="/" replace />} />
 
@@ -77,6 +84,8 @@ function AppRoutes() {
         {user?.role === 'customer' && (
           <>
             <Route path="/" element={<CardHomePage />} />
+            <Route path="/cards/:slug" element={<CardDetailPage />} />
+            <Route path="/m/:slug" element={<CardDetailPage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/rewards" element={<RewardsPage />} />
             <Route path="/scratch/:id" element={<ScratchCardPage />} />
